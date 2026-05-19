@@ -5,17 +5,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#1a2a4a">
-  <title>Cancelar Comida — Rama Garner 2</title>
+  <title>Cancelar Reservación — Rama Garner 2</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
-
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
     :root {
       --navy:   #1a2a4a;
@@ -23,705 +17,402 @@
       --light:  #f4f6fa;
       --white:  #ffffff;
       --gray:   #888;
+      --green:  #2e7d32;
       --red:    #c0392b;
       --red-bg: #fdf0f0;
       --radius: 14px;
       --shadow: 0 4px 24px rgba(26,42,74,0.13);
     }
 
-    html, body {
-      min-height: 100%;
-      background: var(--light);
-      font-family: 'DM Sans', sans-serif;
-      color: var(--navy);
+    html, body { min-height: 100%; background: var(--light); font-family: 'DM Sans', sans-serif; color: var(--navy); }
+
+    .app { max-width: 430px; margin: 0 auto; min-height: 100vh; background: var(--white); box-shadow: 0 0 40px rgba(0,0,0,0.08); }
+
+    .header { background: var(--navy); padding: 20px 20px 22px; }
+    .header-branch { color: rgba(200,169,110,0.7); font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
+    .header-title  { color: var(--white); font-family: 'DM Serif Display', serif; font-size: 20px; }
+    .header-sub    { color: var(--gold); font-size: 12px; font-weight: 600; margin-top: 4px; min-height: 16px; }
+
+    .content { padding: 24px 16px 48px; }
+
+    /* ── Loading ── */
+    .loading-wrap { text-align: center; padding: 48px 16px; }
+    .loading-spinner {
+      display: inline-block; width: 28px; height: 28px;
+      border: 3px solid rgba(26,42,74,0.12); border-top-color: var(--navy);
+      border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 14px;
     }
-
-    .app {
-      max-width: 430px;
-      margin: 0 auto;
-      min-height: 100vh;
-      background: var(--white);
-      box-shadow: 0 0 40px rgba(0,0,0,0.08);
-    }
-
-    /* ── Header ─────────────────────────────────────────────────────────── */
-
-    .header {
-      background: var(--navy);
-      padding: 20px 20px 18px;
-    }
-
-    .header-branch {
-      color: rgba(200,169,110,0.7);
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 4px;
-    }
-
-    .header-title {
-      color: var(--white);
-      font-family: 'DM Serif Display', serif;
-      font-size: 20px;
-      line-height: 1.2;
-    }
-
-    /* ── Main content ───────────────────────────────────────────────────── */
-
-    .content {
-      padding: 24px 16px 48px;
-    }
-
-    /* ── States ─────────────────────────────────────────────────────────── */
-
-    .state { display: none; }
-    .state.active { display: block; }
-
-    /* Loading */
-    .loading-wrap {
-      text-align: center;
-      padding: 48px 0 32px;
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 32px;
-      height: 32px;
-      border: 3px solid rgba(26,42,74,0.15);
-      border-top-color: var(--navy);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin-bottom: 16px;
-    }
-
+    .loading-text { font-size: 14px; color: var(--gray); }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .loading-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--navy);
+    /* ── Error / info states ── */
+    .state-card {
+      border-radius: var(--radius); padding: 24px 20px; text-align: center; margin-bottom: 20px;
     }
+    .state-icon  { font-size: 48px; display: block; margin-bottom: 12px; }
+    .state-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 8px; }
+    .state-msg   { font-size: 14px; color: var(--gray); line-height: 1.7; }
 
-    /* Error */
-    .error-card {
-      background: var(--red-bg);
-      border: 1px solid #f0c0c0;
-      border-radius: var(--radius);
-      padding: 20px;
-      text-align: center;
-    }
+    .state-card.error   { background: var(--red-bg); border: 1px solid #f0c0c0; }
+    .state-card.success { background: #f0f9f0; border: 1px solid #a8d5a0; }
+    .state-card.info    { background: var(--light); border: 1px solid #dde4f0; }
 
-    .error-icon  { font-size: 40px; margin-bottom: 12px; display: block; }
-    .error-title { font-size: 17px; font-weight: 700; color: var(--red); margin-bottom: 8px; }
-    .error-msg   { font-size: 14px; color: #7a2a2a; line-height: 1.6; }
-
-    .contact-note {
-      margin-top: 20px;
-      background: var(--light);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      font-size: 13px;
-      color: var(--gray);
-      line-height: 1.6;
-      text-align: center;
-    }
-
-    .contact-note strong { color: var(--navy); }
-
-    /* Booking info */
+    /* ── Booking summary ── */
     .booking-card {
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      margin-bottom: 20px;
-      box-shadow: var(--shadow);
+      background: var(--navy); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 20px;
     }
-
     .booking-card-label {
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      opacity: 0.7;
-      margin-bottom: 10px;
+      color: rgba(200,169,110,0.7); font-size: 10px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px;
     }
-
     .booking-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px 0;
-      font-size: 14px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.08); gap: 12px;
     }
-
     .booking-row:last-child { border-bottom: none; }
-    .booking-key { opacity: 0.7; font-weight: 500; }
-    .booking-val { font-weight: 700; text-align: right; max-width: 60%; }
+    .booking-key { font-size: 12px; color: rgba(255,255,255,0.55); flex-shrink: 0; }
+    .booking-val { font-size: 14px; font-weight: 700; color: var(--white); text-align: right; }
 
-    /* Date selection */
-    .section-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--navy);
-      margin-bottom: 4px;
-    }
+    /* ── Date selection ── */
+    .section-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .section-sub   { font-size: 13px; color: var(--gray); line-height: 1.6; margin-bottom: 16px; }
 
-    .section-sub {
-      font-size: 13px;
-      color: var(--gray);
-      line-height: 1.5;
-      margin-bottom: 16px;
-    }
-
-    .date-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
+    .date-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
 
     .date-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      border-radius: var(--radius);
-      border: 2px solid #dde4f0;
-      background: var(--white);
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      -webkit-user-select: none;
-      user-select: none;
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 16px; border-radius: var(--radius);
+      border: 2px solid #dde4f0; background: var(--white);
+      cursor: pointer; transition: all 0.15s;
     }
-
-    .date-item.checked {
-      border-color: var(--red);
-      background: var(--red-bg);
-    }
-
-    .date-item.checked .date-check { background: var(--red); border-color: var(--red); }
-    .date-item.checked .date-check::after { opacity: 1; }
+    .date-item.selected { border-color: var(--red); background: var(--red-bg); }
+    .date-item.selected .date-check { background: var(--red); border-color: var(--red); }
+    .date-item.selected .date-check::after { opacity: 1; }
 
     .date-check {
-      width: 22px;
-      height: 22px;
-      border-radius: 6px;
-      border: 2px solid #dde4f0;
-      background: var(--light);
-      flex-shrink: 0;
-      position: relative;
-      transition: background 0.15s, border-color 0.15s;
+      width: 22px; height: 22px; border-radius: 6px; border: 2px solid #dde4f0;
+      background: var(--light); flex-shrink: 0; position: relative; transition: all 0.15s;
     }
-
     .date-check::after {
-      content: '✓';
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      font-size: 13px;
-      font-weight: 700;
-      opacity: 0;
+      content: '✓'; position: absolute; inset: 0; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: var(--white); opacity: 0;
       transition: opacity 0.15s;
     }
 
     .date-info { flex: 1; min-width: 0; }
+    .date-display { font-size: 15px; font-weight: 700; color: var(--navy); }
+    .date-time    { font-size: 12px; color: var(--gray); margin-top: 2px; }
 
-    .date-display {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--navy);
-      line-height: 1.2;
+    /* ── Select all toggle ── */
+    .select-all-btn {
+      width: 100%; padding: 12px; border-radius: var(--radius);
+      border: 2px dashed #dde4f0; background: var(--white);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+      color: var(--navy); cursor: pointer; margin-bottom: 16px;
+      transition: background 0.15s, border-color 0.15s;
     }
+    .select-all-btn:active { background: var(--light); }
 
-    .date-time {
-      font-size: 12px;
-      color: var(--gray);
-      margin-top: 2px;
-    }
-
-    /* Select all / none */
-    .sel-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .sel-btn {
-      flex: 1;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1.5px solid #dde4f0;
-      background: var(--light);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--navy);
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-
-    .sel-btn:active { background: #dde4f0; }
-
-    /* Warning box */
-    .warning-box {
-      background: #fff8e8;
-      border: 1px solid #e8d5a0;
-      border-radius: var(--radius);
-      padding: 13px 15px;
-      font-size: 13px;
-      color: #7a5a10;
-      line-height: 1.6;
-      margin-bottom: 16px;
-      display: none;
-    }
-
-    .warning-box.visible { display: block; }
-
-    /* Submit */
+    /* ── Confirm button ── */
     .cancel-btn {
-      width: 100%;
-      padding: 17px;
-      border: none;
-      border-radius: var(--radius);
-      background: var(--red);
-      color: var(--white);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
+      width: 100%; padding: 16px; border: none; border-radius: var(--radius);
+      background: var(--red); color: var(--white); font-family: 'DM Sans', sans-serif;
+      font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 6px;
       transition: opacity 0.15s, transform 0.12s;
     }
-
     .cancel-btn:active   { transform: scale(0.98); }
     .cancel-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
-    .btn-spinner {
-      display: inline-block;
-      width: 15px;
-      height: 15px;
-      border: 2.5px solid rgba(255,255,255,0.4);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-right: 7px;
+    .back-link {
+      display: block; text-align: center; margin-top: 16px;
+      font-size: 14px; color: var(--gray); text-decoration: none; padding: 12px;
     }
+    .back-link:hover { color: var(--navy); }
 
-    /* Error inline */
-    .inline-error {
-      background: var(--red-bg);
-      border: 1px solid #f0c0c0;
-      border-radius: 10px;
-      padding: 12px 14px;
-      color: var(--red);
-      font-size: 13px;
-      margin-top: 12px;
-      display: none;
+    /* ── Error box ── */
+    .error-box {
+      background: var(--red-bg); border: 1px solid #f0c0c0; border-radius: 10px;
+      padding: 12px 14px; color: var(--red); font-size: 13px; margin-bottom: 14px; display: none;
     }
+    .error-box.visible { display: block; }
 
-    .inline-error.visible { display: block; }
-
-    /* ── Success ─────────────────────────────────────────────────────────── */
-
-    .success-wrap { text-align: center; padding: 16px 0; }
-    .success-icon { font-size: 56px; margin-bottom: 14px; display: block; }
-
-    .success-title {
-      font-family: 'DM Serif Display', serif;
-      font-size: 24px;
-      color: var(--navy);
-      margin-bottom: 8px;
+    /* ── Spinner inline ── */
+    .spinner {
+      display: inline-block; width: 15px; height: 15px;
+      border: 2.5px solid rgba(255,255,255,0.4); border-top-color: var(--white);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+      vertical-align: middle; margin-right: 7px;
     }
-
-    .success-msg {
-      font-size: 15px;
-      color: var(--gray);
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-
-    .success-note {
-      background: var(--light);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      font-size: 13px;
-      color: var(--gray);
-      line-height: 1.7;
-      text-align: left;
-    }
-
-    .success-note strong { color: var(--navy); }
-
-    /* ── Re-book button ─────────────────────────────────────────────────── */
-
-    .rebook-btn {
-      display: inline-block;
-      margin-top: 14px;
-      padding: 13px 24px;
-      border-radius: var(--radius);
-      background: var(--navy);
-      color: var(--gold);
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: opacity 0.15s;
-    }
-
-    .rebook-btn:active { opacity: 0.75; }
-
-    /* ── Partial — remaining dates after partial cancel ─────────────────── */
-
-    .partial-remaining {
-      background: var(--light);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      margin-top: 16px;
-      font-size: 13px;
-      color: var(--navy);
-      line-height: 1.6;
-    }
-
-    .partial-remaining strong { display: block; margin-bottom: 6px; font-size: 14px; }
   </style>
 </head>
-
 <body>
 <div class="app">
 
   <div class="header">
     <div class="header-branch">Rama Garner 2</div>
-    <div class="header-title">Cancelar Comida</div>
+    <div class="header-title">Cancelar Reservación</div>
+    <div class="header-sub" id="headerSub"></div>
   </div>
 
-  <div class="content">
-
+  <div class="content" id="mainContent">
     <!-- Loading state -->
-    <div class="state active" id="stateLoading">
-      <div class="loading-wrap">
-        <div class="spinner"></div>
-        <div class="loading-title">Buscando su reservación...</div>
-      </div>
+    <div class="loading-wrap" id="loadingState">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Cargando su reservación...</div>
     </div>
 
     <!-- Error state -->
-    <div class="state" id="stateError">
-      <div class="error-card">
-        <span class="error-icon">⚠️</span>
-        <div class="error-title" id="errorTitle">Enlace no válido</div>
-        <div class="error-msg"  id="errorMsg"></div>
+    <div id="errorState" style="display:none">
+      <div class="state-card error">
+        <span class="state-icon">❌</span>
+        <div class="state-title">Enlace no válido</div>
+        <div class="state-msg" id="errorMsg">No se pudo cargar su reservación.</div>
       </div>
-      <div class="contact-note" style="text-align:center">
-        ¿Necesita ayuda?<br><br>
-        <a class="rebook-btn" id="rebookBtnError" href="#">Reservar nueva fecha →</a>
-      </div>
+      <a class="back-link" href="index.html">← Volver a la página de reservaciones</a>
     </div>
 
-    <!-- Cancel form state -->
-    <div class="state" id="stateForm">
-
-      <!-- Booking summary card -->
-      <div class="booking-card" id="bookingCard">
-        <div class="booking-card-label" id="bookingCardLabel">Reservación</div>
-        <div id="bookingRows"></div>
+    <!-- Already cancelled state -->
+    <div id="cancelledState" style="display:none">
+      <div class="state-card info">
+        <span class="state-icon">✅</span>
+        <div class="state-title">Ya cancelada</div>
+        <div class="state-msg">Esta reservación ya fue cancelada anteriormente.</div>
       </div>
+      <a class="back-link" href="index.html">← Volver a la página de reservaciones</a>
+    </div>
 
-      <div class="section-title">¿Qué fechas desea cancelar?</div>
-      <div class="section-sub" id="sectionSub">Seleccione las fechas que necesita cancelar.</div>
+    <!-- Main cancel UI -->
+    <div id="cancelUI" style="display:none">
+      <div class="booking-card" id="bookingCard"></div>
 
-      <div class="sel-row">
-        <button class="sel-btn" onclick="selectAll()">Seleccionar todo</button>
-        <button class="sel-btn" onclick="selectNone()">Quitar selección</button>
-      </div>
+      <div class="section-title">Seleccione las fechas a cancelar</div>
+      <div class="section-sub">Puede cancelar una fecha específica o todas a la vez.</div>
+
+      <button class="select-all-btn" id="selectAllBtn" onclick="toggleSelectAll()">
+        Seleccionar todas las fechas
+      </button>
 
       <div class="date-list" id="dateList"></div>
 
-      <div class="warning-box" id="warningBox"></div>
+      <div class="error-box" id="cancelError"></div>
 
-      <button class="cancel-btn" id="cancelBtn" onclick="submitCancel()" disabled>
+      <button class="cancel-btn" id="cancelBtn" onclick="confirmCancel()" disabled>
         Cancelar fechas seleccionadas
       </button>
 
-      <div class="inline-error" id="inlineError"></div>
-
+      <a class="back-link" href="index.html">← Volver sin cancelar</a>
     </div>
 
     <!-- Success state -->
-    <div class="state" id="stateSuccess">
-      <div class="success-wrap">
-        <span class="success-icon" id="successIcon">✅</span>
-        <div class="success-title" id="successTitle">Cancelación confirmada</div>
-        <div class="success-msg"   id="successMsg"></div>
-        <div class="partial-remaining" id="partialRemaining" style="display:none"></div>
-        <div class="success-note" style="text-align:center">
-          ¿Canceló por error o necesita reagendar?<br><br>
-          <a class="rebook-btn" id="rebookBtnSuccess" href="#">Reservar nueva fecha →</a>
-        </div>
+    <div id="successState" style="display:none">
+      <div class="state-card success">
+        <span class="state-icon">✅</span>
+        <div class="state-title">Cancelación confirmada</div>
+        <div class="state-msg" id="successMsg">Sus fechas han sido canceladas.</div>
       </div>
+      <a class="back-link" href="index.html">← Volver a la página de reservaciones</a>
     </div>
-
   </div>
+
 </div>
 
 <script>
-const API_URL       = 'https://script.google.com/macros/s/AKfycbxSZCtuULFimBn-iXw9JyqERfPjqLdBXXEi6BJaGGThNnFmfhJhqPtr9iBq67MZUXZrWg/exec';
-const BOOKING_URL   = 'https://avellenemaria.github.io/comidas-rama-garner-2/';
-const COORDINATOR   = 'Hermana Campos';
+const API_URL = 'https://script.google.com/macros/s/AKfycbxSZCtuULFimBn-iXw9JyqERfPjqLdBXXEi6BJaGGThNnFmfhJhqPtr9iBq67MZUXZrWg/exec';
 
-// Group colors — matches index.html
-const GROUP_COLORS = {
-  todos_misioneros: { bg: '#134f5c', fg: '#a8dde5' },
-  todos_elderes:    { bg: '#2e5f8a', fg: '#e8d5a0' },
-  elderes_garner:   { bg: '#2e5f8a', fg: '#e8d5a0' },
-  elderes:          { bg: '#2e5f8a', fg: '#e8d5a0' },
-  hermanas:         { bg: '#6d2b4e', fg: '#e8b4cc' },
+let booking      = null;
+let selectedIds  = new Set();
+let allSelected  = false;
+
+const GROUP_LABELS = {
+  todos_misioneros: 'Todos los Misioneros',
+  todos_elderes:    'Todos los Élderes',
+  elderes:          'Élderes Garner',
+  elderes_garner:   'Élderes Garner',
+  hermanas:         'Hermanas',
 };
 
-let booking  = null;   // full booking object from API
-let selected = new Set(); // eventIds selected for cancel
-
-// ── Init ─────────────────────────────────────────────────────────────────────
-
-window.addEventListener('DOMContentLoaded', function() {
-  // Wire rebook links
-  document.querySelectorAll('[id^="rebookBtn"]').forEach(function(el) {
-    el.href = BOOKING_URL;
-  });
-
-  const params = new URLSearchParams(window.location.search);
-  const token  = params.get('token') || '';
+window.addEventListener('DOMContentLoaded', async function() {
+  const token = getToken();
 
   if (!token) {
-    showError('Enlace no válido', 'Este enlace no contiene un código de reservación. Verifique el correo electrónico de confirmación.');
+    showError('Este enlace no es válido o está incompleto.');
     return;
   }
 
-  loadBooking(token);
-});
-
-async function loadBooking(token) {
   try {
-    const url = API_URL + '?action=booking&token=' + encodeURIComponent(token) + '&t=' + Date.now();
-    const res = await fetch(url, { method: 'GET', cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const res  = await fetch(API_URL + '?action=booking&token=' + encodeURIComponent(token) + '&t=' + Date.now(), { cache: 'no-store' });
     const data = await res.json();
 
     if (!data.success) {
-      showError('No se pudo cargar la reservación', data.error || 'Enlace no válido o expirado.');
+      if (data.error && data.error.includes('cancelada')) {
+        showCancelled();
+      } else {
+        showError(data.error || 'No se pudo cargar su reservación.');
+      }
       return;
     }
 
     booking = data.booking;
-    renderForm();
+    renderCancelUI();
 
-  } catch (err) {
-    showError(
-      'Error de conexión',
-      'No se pudo cargar la reservación. Verifique su conexión e intente de nuevo.'
-    );
+  } catch (e) {
+    showError('Error de conexión. Por favor intente de nuevo.');
   }
+});
+
+function getToken() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('token') || '';
 }
 
-// ── Render form ──────────────────────────────────────────────────────────────
+function renderCancelUI() {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('cancelUI').style.display     = 'block';
 
-function renderForm() {
-  const colors = GROUP_COLORS[booking.groupId] || { bg: '#1a2a4a', fg: '#c8a96e' };
+  const groupLabel = GROUP_LABELS[booking.groupId] || booking.groupLabel || booking.groupId;
 
-  // Booking summary card
-  const card = document.getElementById('bookingCard');
-  card.style.background = colors.bg;
-  card.style.color      = colors.fg;
+  document.getElementById('headerSub').textContent = 'Familia ' + booking.familyName;
 
-  document.getElementById('bookingCardLabel').textContent = booking.groupLabel;
+  document.getElementById('bookingCard').innerHTML =
+    '<div class="booking-card-label">Su reservación</div>' +
+    '<div class="booking-row"><span class="booking-key">Familia</span><span class="booking-val">' + escHtml(booking.familyName) + '</span></div>' +
+    '<div class="booking-row"><span class="booking-key">Grupo</span><span class="booking-val">'   + escHtml(groupLabel) + '</span></div>' +
+    '<div class="booking-row"><span class="booking-key">Hora</span><span class="booking-val">'    + escHtml(booking.time) + '</span></div>' +
+    '<div class="booking-row"><span class="booking-key">Fechas</span><span class="booking-val">'  + booking.events.length + ' fecha' + (booking.events.length !== 1 ? 's' : '') + '</span></div>';
 
-  const rows = [
-    { key: 'Familia', val: 'Familia ' + booking.familyName },
-    { key: 'Hora',    val: booking.time },
-    { key: 'Estado',  val: booking.status === 'partial' ? 'Parcialmente cancelada' : 'Activa' },
-  ];
-
-  document.getElementById('bookingRows').innerHTML = rows.map(function(r) {
-    return '<div class="booking-row">' +
-           '<span class="booking-key">' + r.key + '</span>' +
-           '<span class="booking-val">' + r.val + '</span>' +
-           '</div>';
-  }).join('');
-
-  // Subtitle
-  const sub = document.getElementById('sectionSub');
-  if (booking.events.length === 1) {
-    sub.textContent = 'Solo tiene una fecha reservada.';
-  } else {
-    sub.textContent = 'Tiene ' + booking.events.length + ' fechas reservadas. Seleccione las que necesita cancelar.';
-  }
-
-  // Date checkboxes
-  const list = document.getElementById('dateList');
-  list.innerHTML = '';
+  const listEl = document.getElementById('dateList');
+  listEl.innerHTML = '';
 
   booking.events.forEach(function(ev) {
     const item = document.createElement('div');
-    item.className   = 'date-item';
-    item.dataset.eid = ev.eventId;
-    item.innerHTML   = '<div class="date-check"></div>' +
-                       '<div class="date-info">' +
-                       '<div class="date-display">' + ev.dateDisplay + '</div>' +
-                       '<div class="date-time">' + booking.time + '</div>' +
-                       '</div>';
-    item.addEventListener('click', function() { toggleDate(ev.eventId, item); });
-    list.appendChild(item);
+    item.className  = 'date-item';
+    item.dataset.id = ev.eventId;
+    item.innerHTML  =
+      '<div class="date-check"></div>' +
+      '<div class="date-info">' +
+        '<div class="date-display">' + escHtml(ev.dateDisplay) + '</div>' +
+        '<div class="date-time">' + escHtml(booking.time) + '</div>' +
+      '</div>';
+    item.onclick = function() { toggleDate(ev.eventId, item); };
+    listEl.appendChild(item);
   });
-
-  // If only one date, pre-select it
-  if (booking.events.length === 1) {
-    const onlyItem = list.querySelector('.date-item');
-    if (onlyItem) toggleDate(booking.events[0].eventId, onlyItem);
-  }
-
-  showState('stateForm');
 }
-
-// ── Date selection ───────────────────────────────────────────────────────────
 
 function toggleDate(eventId, item) {
-  if (selected.has(eventId)) {
-    selected.delete(eventId);
-    item.classList.remove('checked');
+  if (selectedIds.has(eventId)) {
+    selectedIds.delete(eventId);
+    item.classList.remove('selected');
   } else {
-    selected.add(eventId);
-    item.classList.add('checked');
+    selectedIds.add(eventId);
+    item.classList.add('selected');
   }
-  updateCancelButton();
+  updateCancelBtn();
+  syncSelectAllState();
 }
 
-function selectAll() {
+function toggleSelectAll() {
+  allSelected = !allSelected;
+  selectedIds.clear();
+
   document.querySelectorAll('.date-item').forEach(function(item) {
-    selected.add(item.dataset.eid);
-    item.classList.add('checked');
+    if (allSelected) {
+      selectedIds.add(item.dataset.id);
+      item.classList.add('selected');
+    } else {
+      item.classList.remove('selected');
+    }
   });
-  updateCancelButton();
+
+  document.getElementById('selectAllBtn').textContent = allSelected
+    ? 'Deseleccionar todas'
+    : 'Seleccionar todas las fechas';
+
+  updateCancelBtn();
 }
 
-function selectNone() {
-  selected.clear();
-  document.querySelectorAll('.date-item').forEach(function(item) {
-    item.classList.remove('checked');
-  });
-  updateCancelButton();
+function syncSelectAllState() {
+  const total    = booking.events.length;
+  const selCount = selectedIds.size;
+  allSelected    = selCount === total;
+  document.getElementById('selectAllBtn').textContent = allSelected
+    ? 'Deseleccionar todas'
+    : 'Seleccionar todas las fechas';
 }
 
-function updateCancelButton() {
-  const btn     = document.getElementById('cancelBtn');
-  const warning = document.getElementById('warningBox');
-  const count   = selected.size;
-
-  btn.disabled = count === 0;
-
-  if (count === 0) {
-    btn.textContent = 'Cancelar fechas seleccionadas';
-    warning.classList.remove('visible');
-    return;
-  }
-
-  const isAll = count === booking.events.length;
-
-  btn.textContent = isAll
-    ? 'Cancelar toda la reservación (' + count + ' fecha' + (count > 1 ? 's' : '') + ')'
-    : 'Cancelar ' + count + ' fecha' + (count > 1 ? 's' : '') + ' seleccionada' + (count > 1 ? 's' : '');
-
-  if (isAll && booking.events.length > 1) {
-    warning.textContent = '⚠️ Va a cancelar TODAS sus fechas. Esta acción no se puede deshacer.';
-    warning.classList.add('visible');
-  } else {
-    warning.classList.remove('visible');
-  }
-}
-
-// ── Submit cancel ────────────────────────────────────────────────────────────
-
-async function submitCancel() {
-  if (selected.size === 0) return;
-
+function updateCancelBtn() {
   const btn   = document.getElementById('cancelBtn');
-  const error = document.getElementById('inlineError');
+  const count = selectedIds.size;
+  btn.disabled    = count === 0;
+  btn.textContent = count === 0
+    ? 'Cancelar fechas seleccionadas'
+    : 'Cancelar ' + count + ' fecha' + (count !== 1 ? 's' : '') + ' seleccionada' + (count !== 1 ? 's' : '');
+}
 
-  error.classList.remove('visible');
+async function confirmCancel() {
+  if (selectedIds.size === 0) return;
+
+  const btn = document.getElementById('cancelBtn');
+  const err = document.getElementById('cancelError');
+
+  err.classList.remove('visible');
   btn.disabled  = true;
-  btn.innerHTML = '<span class="btn-spinner"></span>Cancelando...';
-
-  const payload = {
-    action:   'cancel',
-    token:    booking.token,
-    eventIds: Array.from(selected),
-  };
+  btn.innerHTML = '<span class="spinner"></span>Cancelando...';
 
   try {
-    const res  = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+    const res  = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        action:   'cancel',
+        token:    getToken(),
+        eventIds: Array.from(selectedIds)
+      })
+    });
     const data = await res.json();
 
-    if (data.success) {
-      showSuccess(data);
+    if (!data.success) {
+      err.textContent = data.error || 'Error al cancelar. Por favor intente de nuevo.';
+      err.classList.add('visible');
+      btn.disabled  = false;
+      updateCancelBtn();
       return;
     }
 
-    // Show inline error, re-enable button
-    error.textContent = data.error || 'Hubo un error. Por favor intente de nuevo.';
-    error.classList.add('visible');
-    btn.disabled  = false;
-    btn.innerHTML = 'Cancelar fechas seleccionadas';
+    const cancelledCount = data.cancelled || selectedIds.size;
+    const remaining      = data.remaining || 0;
 
-  } catch (err) {
-    error.textContent = 'Error de conexión. Verifique su internet e intente de nuevo.';
-    error.classList.add('visible');
+    let msg = cancelledCount + ' fecha' + (cancelledCount !== 1 ? 's' : '') + ' cancelada' + (cancelledCount !== 1 ? 's' : '') + ' correctamente.';
+    if (remaining > 0) {
+      msg += ' Le quedan ' + remaining + ' fecha' + (remaining !== 1 ? 's' : '') + ' activa' + (remaining !== 1 ? 's' : '') + '.';
+    } else {
+      msg += ' Su reservación ha sido cancelada por completo.';
+    }
+
+    document.getElementById('successMsg').textContent = msg;
+    document.getElementById('cancelUI').style.display     = 'none';
+    document.getElementById('successState').style.display = 'block';
+
+  } catch (e) {
+    err.textContent = 'Error de conexión. Por favor intente de nuevo.';
+    err.classList.add('visible');
     btn.disabled  = false;
-    btn.innerHTML = 'Cancelar fechas seleccionadas';
+    updateCancelBtn();
   }
 }
 
-// ── Show success ─────────────────────────────────────────────────────────────
-
-function showSuccess(data) {
-  const isAll  = data.status === 'cancelled';
-  const count  = data.cancelled;
-
-  document.getElementById('successIcon').textContent  = isAll ? '✅' : '✅';
-  document.getElementById('successTitle').textContent = isAll ? 'Reservación cancelada' : 'Fechas canceladas';
-  document.getElementById('successMsg').textContent   =
-    count === 1
-      ? 'Su fecha ha sido cancelada. Ese día ya estará disponible para otras familias.'
-      : count + ' fechas han sido canceladas. Esos días ya estarán disponibles para otras familias.';
-
-  const partialEl = document.getElementById('partialRemaining');
-  if (!isAll && data.remaining > 0) {
-    partialEl.style.display = 'block';
-    partialEl.innerHTML     =
-      '<strong>Fechas que quedan activas:</strong>' +
-      'Todavía tiene ' + data.remaining + ' fecha' + (data.remaining > 1 ? 's' : '') +
-      ' reservada' + (data.remaining > 1 ? 's' : '') + '. ' +
-      'Los misioneros les llamarán para confirmar antes de cada comida.';
-  } else {
-    partialEl.style.display = 'none';
-  }
-
-  showState('stateSuccess');
+function showError(msg) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('errorMsg').textContent       = msg;
+  document.getElementById('errorState').style.display   = 'block';
 }
 
-// ── State helpers ────────────────────────────────────────────────────────────
-
-function showState(stateId) {
-  document.querySelectorAll('.state').forEach(function(s) {
-    s.classList.remove('active');
-  });
-  document.getElementById(stateId).classList.add('active');
+function showCancelled() {
+  document.getElementById('loadingState').style.display   = 'none';
+  document.getElementById('cancelledState').style.display = 'block';
 }
 
-function showError(title, msg) {
-  document.getElementById('errorTitle').textContent = title;
-  document.getElementById('errorMsg').textContent   = msg;
-  showState('stateError');
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
 </body>
