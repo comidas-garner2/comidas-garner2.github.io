@@ -128,6 +128,34 @@
       color: var(--gold);
     }
 
+
+    .lang-toggle {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 0 14px;
+    }
+
+    .lang-btn {
+      border: 1px solid rgba(200,169,110,0.45);
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.78);
+      border-radius: 999px;
+      padding: 7px 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lang-btn.active {
+      background: var(--gold);
+      color: var(--navy);
+      border-color: var(--gold);
+    }
+
+    html[lang="en"] .time-btn.taken::after { content: ' — Booked'; }
+
     .steps {
       display: flex;
       gap: 4px;
@@ -853,9 +881,13 @@
       <button class="back-btn" id="backBtn" onclick="goBack()">‹</button>
       <div class="header-text">
         <div class="header-branch">Rama Garner 2</div>
-        <div class="header-title">Comidas para los Misioneros</div>
+        <div class="header-title" data-i18n="headerTitle">Comidas para los Misioneros</div>
         <div class="header-subtitle" id="headerSub"></div>
       </div>
+    </div>
+    <div class="lang-toggle" aria-label="Language">
+      <button type="button" class="lang-btn active" id="langEs" onclick="setLanguage('es')">Español</button>
+      <button type="button" class="lang-btn" id="langEn" onclick="setLanguage('en')">English</button>
     </div>
     <div class="steps" id="stepDots">
       <div class="step-dot active" id="dot1"></div>
@@ -868,8 +900,8 @@
 
   <!-- Screen 1: Group selection -->
   <div class="screen active" id="s1">
-    <p class="screen-title">¿A quién desea invitar?</p>
-    <p class="screen-sub">Seleccione el grupo para ver las fechas disponibles.</p>
+    <p class="screen-title" data-i18n="groupTitle">¿A quién desea invitar?</p>
+    <p class="screen-sub" data-i18n="groupSub">Seleccione el grupo para ver las fechas disponibles.</p>
     <div class="group-list" id="groupList"></div>
   </div>
 
@@ -877,11 +909,11 @@
   <div class="screen" id="s2">
     <div class="calendar-loading" id="calendarLoading">
       <div class="loading-spinner"></div>
-      <div class="loading-title">Cargando fechas disponibles...</div>
-      <div class="loading-sub">Espere unos segundos mientras revisamos el calendario.</div>
+      <div class="loading-title" data-i18n="loadingTitle">Cargando fechas disponibles...</div>
+      <div class="loading-sub" data-i18n="loadingSub">Espere unos segundos mientras revisamos el calendario.</div>
     </div>
 
-    <div class="calendar-error" id="calendarError">
+    <div class="calendar-error" id="calendarError" data-i18n="calendarError">
       No se pudieron cargar las fechas. Por favor intente de nuevo.
     </div>
 
@@ -898,14 +930,14 @@
           Revisando disponibilidad...
         </button>
         <div class="avail-panel" id="availPanel">
-          <div class="avail-panel-header">Misioneros que aún necesitan comida este mes</div>
+          <div class="avail-panel-header" data-i18n="availPanelHeader">Misioneros que aún necesitan comida este mes</div>
           <div class="avail-panel-loading" id="availPanelLoading">
             <div class="loading-spinner"></div>
-            <div>Revisando disponibilidad...</div>
+            <div data-i18n="checkingAvailability">Revisando disponibilidad...</div>
           </div>
           <div class="avail-panel-advancing" id="availPanelAdvancing">
-            📅 Este mes está completo para todos los grupos.<br>
-            Avanzando al próximo mes...
+            <span data-i18n-html="monthCompleteAdvancing">📅 Este mes está completo para todos los grupos.<br>
+            Avanzando al próximo mes...</span>
           </div>
           <div id="availPanelRows"></div>
           <div class="avail-panel-empty" id="availPanelEmpty"></div>
@@ -917,20 +949,20 @@
       <div class="cal-legend">
         <div class="legend-item">
           <div class="legend-dot" id="legendAvail" style="background:var(--navy)"></div>
-          <span>Disponible</span>
+          <span data-i18n="available">Disponible</span>
         </div>
         <div class="legend-item">
           <div class="legend-dot" style="background:#eaecf2;border:1px solid #ccc"></div>
-          <span>Reservado ✕</span>
+          <span data-i18n="bookedX">Reservado ✕</span>
         </div>
         <div class="legend-item">
           <div class="legend-dot" style="background:#ddd"></div>
-          <span>Pasado</span>
+          <span data-i18n="past">Pasado</span>
         </div>
       </div>
 
       <div class="cal-next-hint" id="calNextHint">
-        👉 ¿No ve su fecha? Toque › para ver el próximo mes
+        <span data-i18n="nextMonthHint">👉 ¿No ve su fecha? Toque › para ver el próximo mes</span>
       </div>
 
     </div>
@@ -942,8 +974,8 @@
       <span class="date-banner-icon">📅</span>
       <span class="date-banner-text" id="dateBannerText"></span>
     </div>
-    <p class="screen-title">Seleccione la hora</p>
-    <p class="screen-sub">Escoja la hora a la que prefiere servir la comida.</p>
+    <p class="screen-title" data-i18n="timeTitle">Seleccione la hora</p>
+    <p class="screen-sub" data-i18n="timeSub">Escoja la hora a la que prefiere servir la comida.</p>
     <div class="time-grid" id="timeGrid"></div>
   </div>
 
@@ -953,8 +985,8 @@
       <span class="date-banner-icon">🔁</span>
       <span class="date-banner-text" id="recurBannerText"></span>
     </div>
-    <p class="recurring-title">¿Desea repetir esta comida semanalmente?</p>
-    <p class="recurring-sub">Solo se muestran las semanas disponibles. El último día se enviará un recordatorio para reservar el siguiente período.</p>
+    <p class="recurring-title" data-i18n="recurringTitle">¿Desea repetir esta comida semanalmente?</p>
+    <p class="recurring-sub" data-i18n="recurringSub">Solo se muestran las semanas disponibles. El último día se enviará un recordatorio para reservar el siguiente período.</p>
     <div class="recur-opts" id="recurOpts"></div>
   </div>
 
@@ -965,37 +997,37 @@
     <div class="error-box" id="errorBox"></div>
 
     <div class="field">
-      <label>Apellido de la familia <span class="req">*</span></label>
-      <input type="text" id="fNombre" placeholder="Apellido (ej: García)" autocomplete="family-name">
+      <label><span data-i18n="familyLastName">Apellido de la familia</span> <span class="req">*</span></label>
+      <input type="text" id="fNombre" placeholder="Apellido (ej: García)" data-placeholder="familyPlaceholder" autocomplete="family-name">
     </div>
     <div class="field">
-      <label>Teléfono <span class="req">*</span></label>
+      <label><span data-i18n="phone">Teléfono</span> <span class="req">*</span></label>
       <input type="tel" id="fTelefono" placeholder="(919) 000-0000" autocomplete="tel">
     </div>
     <div class="field">
-      <label>Correo electrónico <span class="opt">(opcional — para confirmación)</span></label>
-      <input type="email" id="fEmail" placeholder="correo@ejemplo.com" autocomplete="email">
+      <label><span data-i18n="email">Correo electrónico</span> <span class="opt" data-i18n="emailOpt">(opcional — para confirmación)</span></label>
+      <input type="email" id="fEmail" placeholder="correo@ejemplo.com" data-placeholder="emailPlaceholder" autocomplete="email">
     </div>
 
     <!-- Safety screening question — shown only when coordinator activates it -->
     <div class="field" id="screeningField" style="display:none">
-      <label>¿Puede recibir a los misioneros? <span class="req">*</span></label>
+      <label><span data-i18n="screeningTitle">¿Puede recibir a los misioneros?</span> <span class="req">*</span></label>
       <p style="font-size:13px;color:var(--gray);margin-bottom:10px;line-height:1.5">
-        Los misioneros que sirven actualmente son del sexo opuesto. ¿Puede recibirlos en su hogar, o necesita coordinar un acompañante?
+        <span data-i18n="screeningSub">Los misioneros que sirven actualmente son del sexo opuesto. ¿Puede recibirlos en su hogar, o necesita coordinar un acompañante?</span>
       </p>
       <div style="display:flex;gap:8px">
-        <button type="button" class="screening-pill" id="screenYes" onclick="selectScreening('yes')">Sí, no hay problema</button>
-        <button type="button" class="screening-pill" id="screenNo"  onclick="selectScreening('no')">Necesito coordinar</button>
+        <button type="button" class="screening-pill" id="screenYes" onclick="selectScreening('yes')" data-i18n="screenYes">Sí, no hay problema</button>
+        <button type="button" class="screening-pill" id="screenNo"  onclick="selectScreening('no')" data-i18n="screenNo">Necesito coordinar</button>
       </div>
     </div>
 
     <div class="field">
-      <label>Notas <span class="opt">(opcional)</span></label>
-      <textarea id="fNotas" placeholder="Instrucciones de entrega, alergias, etc."></textarea>
+      <label><span data-i18n="notes">Notas</span> <span class="opt" data-i18n="optional">(opcional)</span></label>
+      <textarea id="fNotas" placeholder="Instrucciones de entrega, alergias, etc." data-placeholder="notesPlaceholder"></textarea>
     </div>
 
     <button class="submit-btn" id="submitBtn" onclick="submitBooking()">
-      Confirmar comida
+      <span data-i18n="confirmMeal">Confirmar comida</span>
     </button>
   </div>
 
@@ -1003,12 +1035,12 @@
   <div class="screen" id="s6">
     <div class="success-wrap">
       <span class="success-icon">🙏</span>
-      <div class="success-title">¡Gracias!</div>
+      <div class="success-title" data-i18n="thanks">¡Gracias!</div>
       <div class="success-msg" id="successMsg"></div>
       <div class="success-card" id="successCard"></div>
       <div class="success-note">
-        Los misioneros les llamarán para confirmar antes de cada comida.<br><br>
-        Si necesita cancelar, use el enlace en su correo de confirmación.
+        <span data-i18n-html="successNote">Los misioneros les llamarán para confirmar antes de cada comida.<br><br>
+        Si necesita cancelar, use el enlace en su correo de confirmación.</span>
       </div>
     </div>
   </div>
@@ -1041,6 +1073,267 @@ const RECUR_OPTIONS_ALL = [
 
 const API_URL = 'https://script.google.com/macros/s/AKfycbxSZCtuULFimBn-iXw9JyqERfPjqLdBXXEi6BJaGGThNnFmfhJhqPtr9iBq67MZUXZrWg/exec';
 
+let currentLang = 'es';
+
+const I18N = {
+  es: {
+    headerTitle: 'Comidas para los Misioneros',
+    groupTitle: '¿A quién desea invitar?',
+    groupSub: 'Seleccione el grupo para ver las fechas disponibles.',
+    loadingTitle: 'Cargando fechas disponibles...',
+    loadingSub: 'Espere unos segundos mientras revisamos el calendario.',
+    calendarError: 'No se pudieron cargar las fechas. Por favor intente de nuevo.',
+    availPanelHeader: 'Misioneros que aún necesitan comida este mes',
+    checkingAvailability: 'Revisando disponibilidad...',
+    monthCompleteAdvancing: '📅 Este mes está completo para todos los grupos.<br>Avanzando al próximo mes...',
+    available: 'Disponible',
+    bookedX: 'Reservado ✕',
+    past: 'Pasado',
+    nextMonthHint: '👉 ¿No ve su fecha? Toque › para ver el próximo mes',
+    timeTitle: 'Seleccione la hora',
+    timeSub: 'Escoja la hora a la que prefiere servir la comida.',
+    recurringTitle: '¿Desea repetir esta comida semanalmente?',
+    recurringSub: 'Solo se muestran las semanas disponibles. El último día se enviará un recordatorio para reservar el siguiente período.',
+    familyLastName: 'Apellido de la familia',
+    familyPlaceholder: 'Apellido (ej: García)',
+    phone: 'Teléfono',
+    email: 'Correo electrónico',
+    emailOpt: '(opcional — para confirmación)',
+    emailPlaceholder: 'correo@ejemplo.com',
+    screeningTitle: '¿Puede recibir a los misioneros?',
+    screeningSub: 'Los misioneros que sirven actualmente son del sexo opuesto. ¿Puede recibirlos en su hogar, o necesita coordinar un acompañante?',
+    screenYes: 'Sí, no hay problema',
+    screenNo: 'Necesito coordinar',
+    notes: 'Notas',
+    optional: '(opcional)',
+    notesPlaceholder: 'Instrucciones de entrega, alergias, etc.',
+    confirmMeal: 'Confirmar comida',
+    sending: 'Enviando...',
+    thanks: '¡Gracias!',
+    successNote: 'Los misioneros les llamarán para confirmar antes de cada comida.<br><br>Si necesita cancelar, use el enlace en su correo de confirmación.',
+    groupSummary: 'Grupo',
+    firstDate: 'Primera fecha',
+    time: 'Hora',
+    weeks: 'Semanas',
+    onlyThisDate: 'Solo esta fecha',
+    family: 'Familia',
+    enterFamily: 'Por favor ingrese el apellido de su familia.',
+    enterPhone: 'Por favor ingrese su número de teléfono.',
+    answerScreening: 'Por favor indique si puede recibir a los misioneros.',
+    conflict: '⚠️ Otra familia reservó esa fecha justo antes. Recargando el calendario para que vea las fechas disponibles...',
+    genericError: 'Hubo un error. Intente de nuevo.',
+    connectionError: 'Error de conexión. Por favor intente de nuevo.',
+    monthChecking: 'Revisando si otros misioneros necesitan comida este mes...',
+    monthCompleteButton: month => `📅 Este mes está completo — ver disponibilidad en ${month}`,
+    stillNeedMeals: '🍽️ Aún hay misioneros sin comida este mes — ver disponibilidad',
+    monthCompleteEmpty: month => `Este mes está completo para todos los grupos. Toque el botón de arriba para ver disponibilidad en ${month}.`,
+    nextDate: date => `Próxima fecha: ${date}`,
+    reserve: 'Reservar →',
+    callMsg: 'Este horario ya no se puede reservar por internet.<br>Llame directamente a los misioneros para ver si pueden venir a cenar.',
+    limitedWeeks: max => `Solo se muestran ${max} semana${max > 1 ? 's' : ''} porque las siguientes fechas ya están reservadas.`,
+    successMsg: (nombre, group, weeksNote) => `La comida de la familia ${nombre} con ${group} ha sido confirmada${weeksNote}. ¡Que Dios les bendiga!`,
+    weeksNote: weeks => weeks > 1 ? ` por ${weeks} semanas` : '',
+    everyDay: day => `${day}`,
+    groupLabels: {
+      todos_misioneros: 'Todos los Misioneros',
+      elderes_garner: 'Élderes',
+      hermanas: 'Hermanas'
+    },
+    groupDescs: {
+      todos_misioneros: 'Todos los misioneros juntos',
+      elderes_garner: 'Compañía de Élderes',
+      hermanas: 'Compañía de Hermanas'
+    },
+    recurLabels: {
+      1: 'No, solo esta fecha',
+      2: '2 semanas seguidas',
+      3: '3 semanas seguidas',
+      4: '4 semanas (1 mes)',
+      5: '5 semanas seguidas',
+      6: '6 semanas seguidas',
+      7: '7 semanas seguidas',
+      8: '8 semanas (2 meses)'
+    }
+  },
+  en: {
+    headerTitle: 'Meals for the Missionaries',
+    groupTitle: 'Who would you like to invite?',
+    groupSub: 'Select a group to see available dates.',
+    loadingTitle: 'Loading available dates...',
+    loadingSub: 'Please wait a few seconds while we check the calendar.',
+    calendarError: 'Available dates could not be loaded. Please try again.',
+    availPanelHeader: 'Missionaries who still need meals this month',
+    checkingAvailability: 'Checking availability...',
+    monthCompleteAdvancing: '📅 This month is full for all groups.<br>Moving to next month...',
+    available: 'Available',
+    bookedX: 'Booked ✕',
+    past: 'Past',
+    nextMonthHint: '👉 Don’t see your date? Tap › to view next month',
+    timeTitle: 'Select the time',
+    timeSub: 'Choose the time you would prefer to serve the meal.',
+    recurringTitle: 'Would you like to repeat this meal weekly?',
+    recurringSub: 'Only available weeks are shown. On the last day, a reminder will be sent to reserve the next period.',
+    familyLastName: 'Family last name',
+    familyPlaceholder: 'Last name (ex: Smith)',
+    phone: 'Phone',
+    email: 'Email',
+    emailOpt: '(optional — for confirmation)',
+    emailPlaceholder: 'email@example.com',
+    screeningTitle: 'Can you receive the missionaries?',
+    screeningSub: 'The missionaries currently serving are of the opposite sex. Can you receive them in your home, or do you need to coordinate another adult?',
+    screenYes: 'Yes, no problem',
+    screenNo: 'I need to coordinate',
+    notes: 'Notes',
+    optional: '(optional)',
+    notesPlaceholder: 'Delivery instructions, allergies, etc.',
+    confirmMeal: 'Confirm meal',
+    sending: 'Sending...',
+    thanks: 'Thank you!',
+    successNote: 'The missionaries will call you to confirm before each meal.<br><br>If you need to cancel, use the link in your confirmation email.',
+    groupSummary: 'Group',
+    firstDate: 'First date',
+    time: 'Time',
+    weeks: 'Weeks',
+    onlyThisDate: 'Only this date',
+    family: 'Family',
+    enterFamily: 'Please enter your family last name.',
+    enterPhone: 'Please enter your phone number.',
+    answerScreening: 'Please indicate whether you can receive the missionaries.',
+    conflict: '⚠️ Another family booked that date just before you. Reloading the calendar so you can see available dates...',
+    genericError: 'There was an error. Please try again.',
+    connectionError: 'Connection error. Please try again.',
+    monthChecking: 'Checking whether other missionaries need meals this month...',
+    monthCompleteButton: month => `📅 This month is full — see availability in ${month}`,
+    stillNeedMeals: '🍽️ Some missionaries still need meals this month — see availability',
+    monthCompleteEmpty: month => `This month is full for all groups. Tap the button above to see availability in ${month}.`,
+    nextDate: date => `Next date: ${date}`,
+    reserve: 'Book →',
+    callMsg: 'This time can no longer be booked online.<br>Please call the missionaries directly to see if they can come to dinner.',
+    limitedWeeks: max => `Only ${max} week${max > 1 ? 's are' : ' is'} shown because the following dates are already booked.`,
+    successMsg: (nombre, group, weeksNote) => `The ${nombre} family’s meal with ${group} has been confirmed${weeksNote}. May God bless you!`,
+    weeksNote: weeks => weeks > 1 ? ` for ${weeks} weeks` : '',
+    everyDay: day => `${day}`,
+    groupLabels: {
+      todos_misioneros: 'All Missionaries',
+      elderes_garner: 'Elders',
+      hermanas: 'Sisters'
+    },
+    groupDescs: {
+      todos_misioneros: 'All missionaries together',
+      elderes_garner: 'Elders companionship',
+      hermanas: 'Sisters companionship'
+    },
+    recurLabels: {
+      1: 'No, only this date',
+      2: '2 weeks in a row',
+      3: '3 weeks in a row',
+      4: '4 weeks (1 month)',
+      5: '5 weeks in a row',
+      6: '6 weeks in a row',
+      7: '7 weeks in a row',
+      8: '8 weeks (2 months)'
+    }
+  }
+};
+
+const MONTHS = {
+  es: ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+  en: ['January','February','March','April','May','June','July','August','September','October','November','December']
+};
+
+const DOW_SHORT = {
+  es: ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'],
+  en: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']
+};
+
+const DOW_LONG = {
+  es: ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'],
+  en: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']
+};
+
+const MONTHS_LONG = {
+  es: ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'],
+  en: ['January','February','March','April','May','June','July','August','September','October','November','December']
+};
+
+function tr(key) {
+  return I18N[currentLang][key] ?? I18N.es[key] ?? key;
+}
+
+function groupDisplayLabel(g) {
+  return tr('groupLabels')[g.id] || g.label;
+}
+
+function groupDisplayDesc(g) {
+  return tr('groupDescs')[g.id] || g.desc;
+}
+
+function recurDisplayLabel(weeks) {
+  return tr('recurLabels')[weeks] || RECUR_OPTIONS_ALL.find(o => o.weeks === weeks)?.label || '';
+}
+
+function setLanguage(lang) {
+  currentLang = lang === 'en' ? 'en' : 'es';
+  localStorage.setItem('mealSchedulerLang', currentLang);
+  applyLanguage();
+}
+
+function applyLanguage() {
+  document.documentElement.lang = currentLang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    el.textContent = tr(el.dataset.i18n);
+  });
+
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    el.innerHTML = tr(el.dataset.i18nHtml);
+  });
+
+  document.querySelectorAll('[data-placeholder]').forEach(el => {
+    el.setAttribute('placeholder', tr(el.dataset.placeholder));
+  });
+
+  document.getElementById('langEs')?.classList.toggle('active', currentLang === 'es');
+  document.getElementById('langEn')?.classList.toggle('active', currentLang === 'en');
+
+  buildGroupList();
+
+  if (state.group) {
+    document.getElementById('headerSub').textContent = groupDisplayLabel(state.group);
+  }
+
+  const nudgeBtn = document.getElementById('availNudgeBtn');
+  if (nudgeBtn && nudgeBtn.textContent) {
+    if (nudgeBtn.classList.contains('month-complete-btn')) {
+      nudgeBtn.textContent = tr('monthCompleteButton')(getNextMonthLabel());
+    } else if (state.monthAvailabilityResults && state.monthAvailabilityResults.length) {
+      nudgeBtn.textContent = tr('stillNeedMeals');
+    }
+  }
+
+  if (state.step === 2 && !document.getElementById('calendarContent').classList.contains('hidden')) {
+    renderCalendar();
+  }
+
+  if (state.selDate) {
+    document.getElementById('dateBannerText').textContent = formatDateDisplay(state.selDate.date);
+  }
+
+  if (state.selDate && state.selTime) {
+    document.getElementById('recurBannerText').textContent =
+      `${formatDateDisplay(state.selDate.date)} — ${state.selTime}`;
+  }
+
+  if (state.step === 4 && state.selDate) {
+    renderRecurrenceOptions();
+  }
+
+  if (state.step >= 5 && state.group && state.selDate) {
+    renderBookingSummary();
+  }
+}
+
+
 // ── Safety screening state ───────────────────────────────────────────────────
 let safetyScreeningEnabled = false;
 let screeningAnswer        = '';   // 'yes', 'no', or ''
@@ -1067,7 +1360,8 @@ const MESES_LONG = ['enero','febrero','marzo','abril','mayo','junio','julio','ag
 
 // ── Init: load settings then build UI ───────────────────────────────────────
 window.addEventListener('DOMContentLoaded', async () => {
-  buildGroupList();
+  currentLang = localStorage.getItem('mealSchedulerLang') === 'en' ? 'en' : 'es';
+  applyLanguage();
   updateDots(1);
 
   // Load safety screening setting — defaults off, never blocks booking flow
@@ -1094,11 +1388,11 @@ function buildGroupList() {
     btn.style.background = g.bg;
     btn.innerHTML = `
       <div class="group-icon">
-        <img src="${g.icon}" alt="${g.label}" onerror="this.style.display='none'">
+        <img src="${g.icon}" alt="${groupDisplayLabel(g)}" onerror="this.style.display='none'">
       </div>
       <div class="group-info">
-        <div class="group-name" style="color:${g.fg}">${g.label}</div>
-        <div class="group-desc" style="color:${g.fg}">${g.desc}</div>
+        <div class="group-name" style="color:${g.fg}">${groupDisplayLabel(g)}</div>
+        <div class="group-desc" style="color:${g.fg}">${groupDisplayDesc(g)}</div>
       </div>
       <div class="group-arrow" style="color:${g.fg}">›</div>
     `;
@@ -1129,7 +1423,7 @@ async function selectGroup(g) {
   document.documentElement.style.setProperty('--group-color', g.bg);
   document.documentElement.style.setProperty('--group-fg',    g.fg);
   document.getElementById('legendAvail').style.background = g.bg;
-  document.getElementById('headerSub').textContent        = g.label;
+  document.getElementById('headerSub').textContent        = groupDisplayLabel(g);
   document.getElementById('headerSub').style.color        = g.fg;
 
   resetAvailPanel();
@@ -1179,7 +1473,7 @@ function resetAvailPanel() {
   if (nudgeBtn) {
     nudgeBtn.disabled    = false;
     nudgeBtn.className   = 'avail-nudge-btn';
-    nudgeBtn.textContent = 'Revisando disponibilidad...';
+    nudgeBtn.textContent = tr('checkingAvailability');
     nudgeBtn.onclick     = function() { toggleAvailPanel(); };
   }
 }
@@ -1229,7 +1523,7 @@ async function loadBooked() {
 }
 
 function getNextMonthLabel() {
-  return MESES_LONG[(state.calMonth + 1) % 12];
+  return MONTHS_LONG[currentLang][(state.calMonth + 1) % 12];
 }
 
 async function evaluateFullMonthAvailability() {
@@ -1245,7 +1539,7 @@ async function evaluateFullMonthAvailability() {
   if (nudgeBtn) {
     nudgeBtn.disabled    = true;
     nudgeBtn.className   = 'avail-nudge-btn';
-    nudgeBtn.textContent = 'Revisando si otros misioneros necesitan comida este mes...';
+    nudgeBtn.textContent = tr('monthChecking');
   }
 
   const otherGroups = GROUPS.filter(g => g.id !== state.group.id);
@@ -1270,7 +1564,7 @@ async function evaluateFullMonthAvailability() {
     if (nudgeBtn) {
       nudgeBtn.disabled    = false;
       nudgeBtn.className   = 'month-complete-btn';
-      nudgeBtn.textContent = `📅 Este mes está completo — ver disponibilidad en ${getNextMonthLabel()}`;
+      nudgeBtn.textContent = tr('monthCompleteButton')(getNextMonthLabel());
       nudgeBtn.onclick     = function() { changeMonth(1); };
     }
     state.monthAvailabilityResults = [];
@@ -1281,7 +1575,7 @@ async function evaluateFullMonthAvailability() {
   if (nudgeBtn) {
     nudgeBtn.disabled    = false;
     nudgeBtn.className   = 'avail-nudge-btn';
-    nudgeBtn.textContent = '🍽️ Aún hay misioneros sin comida este mes — ver disponibilidad';
+    nudgeBtn.textContent = tr('stillNeedMeals');
     nudgeBtn.onclick     = function() { toggleAvailPanel(); };
   }
 
@@ -1296,7 +1590,7 @@ function renderCalendar() {
   const firstDay = new Date(state.calYear, state.calMonth, 1);
   const lastDay  = new Date(state.calYear, state.calMonth + 1, 0);
 
-  document.getElementById('calMonth').textContent = `${MESES_ES[state.calMonth]} ${state.calYear}`;
+  document.getElementById('calMonth').textContent = `${MONTHS[currentLang][state.calMonth]} ${state.calYear}`;
 
   const nowFirst  = new Date(); nowFirst.setDate(1); nowFirst.setHours(0,0,0,0);
   const thisFirst = new Date(state.calYear, state.calMonth, 1);
@@ -1308,7 +1602,7 @@ function renderCalendar() {
   const grid = document.getElementById('calGrid');
   grid.innerHTML = '';
 
-  DIAS_ES.forEach(d => {
+  DOW_SHORT[currentLang].forEach(d => {
     const cell = document.createElement('div');
     cell.className   = 'cal-dow';
     cell.textContent = d;
@@ -1415,7 +1709,7 @@ async function toggleAvailPanel() {
 
   if (open.length === 0) {
     const emptyEl = document.getElementById('availPanelEmpty');
-    emptyEl.textContent = `Este mes está completo para todos los grupos. Toque el botón de arriba para ver disponibilidad en ${getNextMonthLabel()}.`;
+    emptyEl.textContent = tr('monthCompleteEmpty')(getNextMonthLabel());
     emptyEl.style.display = 'block';
     return;
   }
@@ -1428,9 +1722,9 @@ async function toggleAvailPanel() {
       <div class="avail-group-dot" style="background:${g.bg}"></div>
       <div class="avail-group-info">
         <div class="avail-group-name">${g.label}</div>
-        <div class="avail-group-date">Próxima fecha: ${formatDateDisplay(nextOpen)}</div>
+        <div class="avail-group-date">${tr('nextDate')(formatDateDisplay(nextOpen))}</div>
       </div>
-      <button class="avail-book-btn" style="background:${g.bg};color:${g.fg}">Reservar →</button>
+      <button class="avail-book-btn" style="background:${g.bg};color:${g.fg}">${tr('reserve')}</button>
     `;
     row.querySelector('.avail-book-btn').onclick = () => selectGroup(g);
     rowsEl.appendChild(row);
@@ -1506,8 +1800,7 @@ function selectDate(date, dateStr) {
           <div class="time-call-info">
             <div class="time-call-slot">${slot}</div>
             <div class="time-call-msg">
-              Este horario ya no se puede reservar por internet.<br>
-              Llame directamente a los misioneros para ver si pueden venir a cenar.
+              ${tr('callMsg')}
             </div>
           </div>
         `;
@@ -1532,7 +1825,11 @@ function selectTime(slot) {
   state.selTime = slot;
   document.getElementById('recurBannerText').textContent =
     `${formatDateDisplay(state.selDate.date)} — ${slot}`;
+  renderRecurrenceOptions();
+  goTo(4);
+}
 
+function renderRecurrenceOptions() {
   const maxWeeks = getMaxAvailableWeeks(state.selDate.date);
   const options  = RECUR_OPTIONS_ALL.filter(o => o.weeks <= maxWeeks);
 
@@ -1544,7 +1841,7 @@ function selectTime(slot) {
     btn.className = 'recur-btn';
     btn.style.setProperty('--group-color', state.group.bg);
     btn.style.setProperty('--group-fg',    state.group.fg);
-    btn.innerHTML = `<span class="recur-icon">${o.icon}</span> ${o.label}`;
+    btn.innerHTML = `<span class="recur-icon">${o.icon}</span> ${recurDisplayLabel(o.weeks)}`;
     btn.onclick   = () => selectRecur(o.weeks);
     opts.appendChild(btn);
   });
@@ -1552,15 +1849,23 @@ function selectTime(slot) {
   if (maxWeeks < 8) {
     const note = document.createElement('div');
     note.style.cssText = 'font-size:12px;color:var(--gray);text-align:center;padding:8px 4px;line-height:1.5;';
-    note.textContent   = `Solo se muestran ${maxWeeks} semana${maxWeeks > 1 ? 's' : ''} porque las siguientes fechas ya están reservadas.`;
+    note.textContent   = tr('limitedWeeks')(maxWeeks);
     opts.appendChild(note);
   }
-
-  goTo(4);
 }
 
 function selectRecur(weeks) {
   state.selWeeks = weeks;
+  renderBookingSummary();
+
+  const btn = document.getElementById('submitBtn');
+  btn.style.background = state.group.bg;
+  btn.style.color      = state.group.fg;
+
+  goTo(5);
+}
+
+function renderBookingSummary() {
   const g        = state.group;
   const dateDisp = formatDateDisplay(state.selDate.date);
 
@@ -1568,17 +1873,11 @@ function selectRecur(weeks) {
   summary.style.background = g.bg;
   summary.style.color      = g.fg;
   summary.innerHTML = `
-    <div class="bs-row"><span class="bs-key">Grupo</span><span class="bs-val">${g.label}</span></div>
-    <div class="bs-row"><span class="bs-key">Primera fecha</span><span class="bs-val">${dateDisp}</span></div>
-    <div class="bs-row"><span class="bs-key">Hora</span><span class="bs-val">${state.selTime}</span></div>
-    <div class="bs-row"><span class="bs-key">Semanas</span><span class="bs-val">${weeks === 1 ? 'Solo esta fecha' : `${weeks} semanas`}</span></div>
+    <div class="bs-row"><span class="bs-key">${tr('groupSummary')}</span><span class="bs-val">${groupDisplayLabel(g)}</span></div>
+    <div class="bs-row"><span class="bs-key">${tr('firstDate')}</span><span class="bs-val">${dateDisp}</span></div>
+    <div class="bs-row"><span class="bs-key">${tr('time')}</span><span class="bs-val">${state.selTime}</span></div>
+    <div class="bs-row"><span class="bs-key">${tr('weeks')}</span><span class="bs-val">${state.selWeeks === 1 ? tr('onlyThisDate') : `${state.selWeeks} ${tr('weeks').toLowerCase()}`}</span></div>
   `;
-
-  const btn = document.getElementById('submitBtn');
-  btn.style.background = g.bg;
-  btn.style.color      = g.fg;
-
-  goTo(5);
 }
 
 async function submitBooking() {
@@ -1596,18 +1895,18 @@ async function submitBooking() {
   document.getElementById('errorBox').classList.remove('visible');
   document.getElementById('conflictBox').classList.remove('visible');
 
-  if (!nombre)   { showError('Por favor ingrese el apellido de su familia.'); return; }
-  if (!telefono) { showError('Por favor ingrese su número de teléfono.');     return; }
+  if (!nombre)   { showError(tr('enterFamily')); return; }
+  if (!telefono) { showError(tr('enterPhone'));     return; }
 
   // Screening validation — only required when active and question is visible
   if (safetyScreeningEnabled && !screeningAnswer) {
-    showError('Por favor indique si puede recibir a los misioneros.');
+    showError(tr('answerScreening'));
     return;
   }
 
   const btn = document.getElementById('submitBtn');
   btn.disabled  = true;
-  btn.innerHTML = '<span class="spinner"></span>Enviando...';
+  btn.innerHTML = `<span class="spinner"></span>${tr('sending')}`;
 
   const payload = {
     action:     'book',
@@ -1640,10 +1939,10 @@ async function submitBooking() {
 
     if (isConflict) {
       btn.disabled  = false;
-      btn.innerHTML = 'Confirmar comida';
+      btn.innerHTML = `<span data-i18n="confirmMeal">${tr('confirmMeal')}</span>`;
 
       const conflictBox = document.getElementById('conflictBox');
-      conflictBox.textContent = '⚠️ Otra familia reservó esa fecha justo antes. Recargando el calendario para que vea las fechas disponibles...';
+      conflictBox.textContent = tr('conflict');
       conflictBox.classList.add('visible');
 
       setTimeout(async () => {
@@ -1656,14 +1955,14 @@ async function submitBooking() {
       return;
     }
 
-    showError(result.error || 'Hubo un error. Intente de nuevo.');
+    showError(result.error || tr('genericError'));
     btn.disabled  = false;
-    btn.innerHTML = 'Confirmar comida';
+    btn.innerHTML = `<span data-i18n="confirmMeal">${tr('confirmMeal')}</span>`;
 
   } catch (err) {
-    showError('Error de conexión. Por favor intente de nuevo.');
+    showError(tr('connectionError'));
     btn.disabled  = false;
-    btn.innerHTML = 'Confirmar comida';
+    btn.innerHTML = `<span data-i18n="confirmMeal">${tr('confirmMeal')}</span>`;
   }
 }
 
@@ -1677,20 +1976,20 @@ function showError(msg) {
 function showSuccess(nombre, p) {
   const g         = state.group;
   const dateDisp  = formatDateDisplay(state.selDate.date);
-  const weeksNote = p.weeks > 1 ? ` por ${p.weeks} semanas` : '';
+  const weeksNote = tr('weeksNote')(p.weeks);
 
   document.getElementById('successMsg').textContent =
-    `La comida de la familia ${nombre} con ${g.label} ha sido confirmada${weeksNote}. ¡Que Dios les bendiga!`;
+    tr('successMsg')(nombre, groupDisplayLabel(g), weeksNote);
 
   const card = document.getElementById('successCard');
   card.style.background = g.bg;
   card.style.color      = g.fg;
   card.innerHTML = `
-    <div class="success-card-label" style="color:${g.fg}">${g.label}</div>
+    <div class="success-card-label" style="color:${g.fg}">${groupDisplayLabel(g)}</div>
     <div class="success-row">📅 <span>${dateDisp}</span></div>
     <div class="success-row">🕐 ${p.time}</div>
-    ${p.weeks > 1 ? `<div class="success-row">🔁 ${p.weeks} semanas — cada ${capFirst(DIAS_LONG[state.selDate.date.getDay()])}</div>` : ''}
-    <div class="success-row">👨‍👩‍👧 Familia ${nombre}</div>
+    ${p.weeks > 1 ? `<div class="success-row">🔁 ${p.weeks} ${tr('weeks').toLowerCase()} — ${tr('everyDay')(capFirst(DOW_LONG[currentLang][state.selDate.date.getDay()]))}</div>` : ''}
+    <div class="success-row">👨‍👩‍👧 ${tr('family')} ${nombre}</div>
     <div class="success-row">📞 ${p.telefono}</div>
   `;
 
@@ -1727,7 +2026,10 @@ function pad(n)      { return String(n).padStart(2, '0'); }
 function capFirst(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
 function formatDateDisplay(date) {
-  return `${capFirst(DIAS_LONG[date.getDay()])}, ${date.getDate()} de ${MESES_LONG[date.getMonth()]}`;
+  if (currentLang === 'en') {
+    return `${DOW_LONG.en[date.getDay()]}, ${MONTHS_LONG.en[date.getMonth()]} ${date.getDate()}`;
+  }
+  return `${capFirst(DOW_LONG.es[date.getDay()])}, ${date.getDate()} de ${MONTHS_LONG.es[date.getMonth()]}`;
 }
 </script>
 </body>
