@@ -784,6 +784,27 @@
 
     .conflict-box.visible { display: block; }
 
+    .missionary-info-card {
+      display: none;
+      background: #fffbf0;
+      border: 1px solid #e8d5a0;
+      border-radius: 12px;
+      padding: 13px 15px;
+      color: #7a6020;
+      font-size: 14px;
+      line-height: 1.55;
+      margin-bottom: 15px;
+    }
+
+    .missionary-info-card.visible { display: block; }
+
+    .missionary-info-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #9a7a2a;
+      margin-bottom: 3px;
+    }
+
     /* ── Safety screening pills ── */
     .screening-pill {
       flex: 1;
@@ -993,6 +1014,10 @@
   <!-- Screen 5: Contact form -->
   <div class="screen" id="s5">
     <div class="booking-summary" id="bookingSummary"></div>
+    <div class="missionary-info-card" id="missionaryInfoCard">
+      <div class="missionary-info-title" id="missionaryInfoTitle"></div>
+      <div id="missionaryInfoText"></div>
+    </div>
     <div class="conflict-box" id="conflictBox"></div>
     <div class="error-box" id="errorBox"></div>
 
@@ -1023,7 +1048,7 @@
 
     <div class="field">
       <label><span data-i18n="notes">Notas</span> <span class="opt" data-i18n="optional">(opcional)</span></label>
-      <textarea id="fNotas" placeholder="Instrucciones de entrega, alergias, etc." data-placeholder="notesPlaceholder"></textarea>
+      <textarea id="fNotas" placeholder="Instrucciones de entrega, dirección, etc." data-placeholder="notesPlaceholder"></textarea>
     </div>
 
     <button class="submit-btn" id="submitBtn" onclick="submitBooking()">
@@ -1106,7 +1131,9 @@ const I18N = {
     screenNo: 'Necesito coordinar',
     notes: 'Notas',
     optional: '(opcional)',
-    notesPlaceholder: 'Instrucciones de entrega, alergias, etc.',
+    notesPlaceholder: 'Instrucciones de entrega, dirección, etc.',
+    missionaryInfoTitle: 'Información importante para la comida',
+    missionaryInfoText: info => `Restricciones de comida de los misioneros: ${info}`,
     confirmMeal: 'Confirmar comida',
     sending: 'Enviando...',
     thanks: '¡Gracias!',
@@ -1185,7 +1212,9 @@ const I18N = {
     screenNo: 'I need to coordinate',
     notes: 'Notes',
     optional: '(optional)',
-    notesPlaceholder: 'Delivery instructions, allergies, etc.',
+    notesPlaceholder: 'Delivery instructions, address, etc.',
+    missionaryInfoTitle: 'Important meal information',
+    missionaryInfoText: info => `Missionary food restrictions: ${info}`,
     confirmMeal: 'Confirm meal',
     sending: 'Sending...',
     thanks: 'Thank you!',
@@ -1319,6 +1348,8 @@ function applyLanguage() {
     document.getElementById('dateBannerText').textContent = formatDateDisplay(state.selDate.date);
   }
 
+  updateMissionaryInfoCard();
+
   if (state.selDate && state.selTime) {
     document.getElementById('recurBannerText').textContent =
       `${formatDateDisplay(state.selDate.date)} — ${state.selTime}`;
@@ -1337,6 +1368,7 @@ function applyLanguage() {
 // ── Safety screening state ───────────────────────────────────────────────────
 let safetyScreeningEnabled = false;
 let screeningAnswer        = '';   // 'yes', 'no', or ''
+let missionaryFoodInfo     = {};   // public food restrictions by group
 
 let state = {
   step: 1,
@@ -1371,6 +1403,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const data = await res.json();
     if (data && data.success) {
       safetyScreeningEnabled = !!data.safetyScreeningEnabled;
+      missionaryFoodInfo = data.missionaryFoodInfo || {};
       document.getElementById('screeningField').style.display =
         safetyScreeningEnabled ? 'block' : 'none';
     }
@@ -1854,6 +1887,26 @@ function renderRecurrenceOptions() {
   }
 }
 
+
+function updateMissionaryInfoCard() {
+  const card  = document.getElementById('missionaryInfoCard');
+  const title = document.getElementById('missionaryInfoTitle');
+  const text  = document.getElementById('missionaryInfoText');
+  if (!card || !title || !text) return;
+
+  const info = state.group ? (missionaryFoodInfo[state.group.id] || '') : '';
+  if (!info) {
+    card.classList.remove('visible');
+    title.textContent = '';
+    text.textContent = '';
+    return;
+  }
+
+  title.textContent = tr('missionaryInfoTitle');
+  text.textContent  = tr('missionaryInfoText')(info);
+  card.classList.add('visible');
+}
+
 function selectRecur(weeks) {
   state.selWeeks = weeks;
   renderBookingSummary();
@@ -1916,6 +1969,7 @@ async function submitBooking() {
     time:       state.selTime,
     weeks:      state.selWeeks,
     nombre, telefono, email, notas,
+    lang:       currentLang,
     canReceiveOpposite: screeningAnswer   // '' when screening is off
   };
 
