@@ -878,6 +878,25 @@
       text-align: left;
     }
 
+    .success-action-btn {
+      display: inline-block;
+      width: 100%;
+      margin-top: 16px;
+      padding: 15px 18px;
+      border-radius: var(--radius);
+      background: var(--navy);
+      color: var(--gold);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: opacity 0.15s, transform 0.12s;
+    }
+
+    .success-action-btn:active { opacity: 0.75; transform: scale(0.98); }
+
     .spinner {
       display: inline-block;
       width: 16px;
@@ -1067,6 +1086,7 @@
         <span data-i18n-html="successNote">Los misioneros les llamarán para confirmar antes de cada comida.<br><br>
         Si necesita cancelar, use el enlace en su correo de confirmación.</span>
       </div>
+      <a class="success-action-btn" href="./" data-i18n="scheduleAnother">Programar otra comida</a>
     </div>
   </div>
 
@@ -1138,6 +1158,7 @@ const I18N = {
     sending: 'Enviando...',
     thanks: '¡Gracias!',
     successNote: 'Los misioneros les llamarán para confirmar antes de cada comida.<br><br>Si necesita cancelar, use el enlace en su correo de confirmación.',
+    scheduleAnother: 'Programar otra comida',
     groupSummary: 'Grupo',
     firstDate: 'Primera fecha',
     time: 'Hora',
@@ -1219,6 +1240,7 @@ const I18N = {
     sending: 'Sending...',
     thanks: 'Thank you!',
     successNote: 'The missionaries will call you to confirm before each meal.<br><br>If you need to cancel, use the link in your confirmation email.',
+    scheduleAnother: 'Schedule another meal',
     groupSummary: 'Group',
     firstDate: 'First date',
     time: 'Time',
