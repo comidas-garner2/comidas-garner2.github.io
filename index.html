@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<!-- deploy refresh -->
+<!-- Garner clean transfer update v6: dynamic single-companionship flow -->
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -1354,7 +1354,7 @@ function applyLanguage() {
   document.getElementById('langEs')?.classList.toggle('active', currentLang === 'es');
   document.getElementById('langEn')?.classList.toggle('active', currentLang === 'en');
 
-  buildGroupList();
+  if (!singleGroupMode) buildGroupList();
 
   if (state.group) {
     document.getElementById('headerSub').textContent = groupDisplayLabel(state.group);
@@ -1398,6 +1398,7 @@ function applyLanguage() {
 let safetyScreeningEnabled = false;
 let screeningAnswer        = '';   // 'yes', 'no', or ''
 let missionaryFoodInfo     = {};   // public food restrictions by group
+let singleGroupMode        = false; // when only one missionary set is active, skip group selection
 
 let state = {
   step: 1,
@@ -1425,7 +1426,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   applyLanguage();
   updateDots(1);
 
-  // Load safety screening setting — defaults off, never blocks booking flow
+  // Load coordinator-panel settings. The public page follows the active missionary sets.
   try {
     const url  = `${API_URL}?action=settings&t=${Date.now()}`;
     const res  = await fetch(url, { method: 'GET', cache: 'no-store' });
@@ -1435,13 +1436,16 @@ window.addEventListener('DOMContentLoaded', async () => {
       missionaryFoodInfo = data.missionaryFoodInfo || {};
 
       if (Array.isArray(data.activeGroups)) {
-        GROUPS = data.activeGroups
+        const activeGroups = data.activeGroups
           .filter(g => g && GROUP_CATALOG[g.id])
           .map(g => Object.assign({}, GROUP_CATALOG[g.id], {
             label: g.label || GROUP_CATALOG[g.id].label,
             desc:  g.desc  || GROUP_CATALOG[g.id].desc
           }));
-        buildGroupList();
+
+        if (activeGroups.length > 0) {
+          GROUPS = activeGroups;
+        }
       }
 
       document.getElementById('screeningField').style.display =
@@ -1449,6 +1453,16 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   } catch (e) {
     safetyScreeningEnabled = false;
+  }
+
+  singleGroupMode = GROUPS.length === 1;
+
+  if (singleGroupMode) {
+    // With only one active companionship, do not ask members to choose a group.
+    // Go straight to the calendar for that companionship.
+    await selectGroup(GROUPS[0]);
+  } else {
+    buildGroupList();
   }
 });
 
@@ -2095,11 +2109,15 @@ function goTo(step) {
   document.getElementById(`s${step}`).classList.add('active');
   state.step = step;
   updateDots(step);
-  document.getElementById('backBtn').classList.toggle('visible', step > 1 && step < 6);
+  document.getElementById('backBtn').classList.toggle('visible', step > 1 && step < 6 && !(singleGroupMode && step === 2));
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function goBack() { if (state.step > 1) goTo(state.step - 1); }
+function goBack() {
+  if (singleGroupMode && state.step === 2) return;
+  if (state.step > 1) goTo(state.step - 1);
+}
+
 
 function updateDots(step) {
   for (let i = 1; i <= 5; i++) {
