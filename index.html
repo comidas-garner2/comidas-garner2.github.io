@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <!-- deploy refresh -->
 <html lang="es">
@@ -1093,10 +1094,16 @@
 </div>
 
 <script>
-const GROUPS = [
-  { id: 'todos_misioneros', label: 'Todos los Misioneros', desc: 'Todos los misioneros juntos', icon: 'icon-todos.png', bg: '#134f5c', fg: '#a8dde5' },
-  { id: 'elderes_garner',   label: 'Élderes Garner',       desc: 'Compañía de Élderes',         icon: 'icon-elderes.png', bg: '#2e5f8a', fg: '#e8d5a0' },
-  { id: 'hermanas',         label: 'Hermanas',             desc: 'Compañía de Hermanas',         icon: 'icon-hermanas.jpg', bg: '#6d2b4e', fg: '#e8b4cc' }
+const GROUP_CATALOG = {
+  todos_misioneros: { id: 'todos_misioneros', label: 'Todos los Misioneros', desc: 'Todos los misioneros juntos', icon: 'icon-todos.png', bg: '#134f5c', fg: '#a8dde5' },
+  elderes_garner:   { id: 'elderes_garner',   label: 'Élderes Garner',       desc: 'Compañía de Élderes',         icon: 'icon-elderes.png', bg: '#2e5f8a', fg: '#e8d5a0' },
+  hermanas:         { id: 'hermanas',         label: 'Hermanas',             desc: 'Compañía de Hermanas',         icon: 'icon-hermanas.jpg', bg: '#6d2b4e', fg: '#e8b4cc' }
+};
+
+let GROUPS = [
+  GROUP_CATALOG.todos_misioneros,
+  GROUP_CATALOG.elderes_garner,
+  GROUP_CATALOG.hermanas
 ];
 
 const TIME_SLOTS = [
@@ -1426,6 +1433,17 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (data && data.success) {
       safetyScreeningEnabled = !!data.safetyScreeningEnabled;
       missionaryFoodInfo = data.missionaryFoodInfo || {};
+
+      if (Array.isArray(data.activeGroups)) {
+        GROUPS = data.activeGroups
+          .filter(g => g && GROUP_CATALOG[g.id])
+          .map(g => Object.assign({}, GROUP_CATALOG[g.id], {
+            label: g.label || GROUP_CATALOG[g.id].label,
+            desc:  g.desc  || GROUP_CATALOG[g.id].desc
+          }));
+        buildGroupList();
+      }
+
       document.getElementById('screeningField').style.display =
         safetyScreeningEnabled ? 'block' : 'none';
     }
