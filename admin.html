@@ -401,7 +401,8 @@ function populateSetsScreen() {
 function addSet(existing) {
   setCounter++;
   const id   = 'set_' + setCounter;
-  const type = existing ? existing.type      : 'elderes';
+  const typeRaw = existing ? existing.type      : 'elderes';
+  const type = (typeRaw === 'elderes_garner') ? 'elderes' : typeRaw;
   const lbl  = existing ? existing.label     : '';
   const alg  = existing ? existing.allergies : '';
 
@@ -410,23 +411,23 @@ function addSet(existing) {
   card.id        = id;
   card.innerHTML =
     '<div class="set-card-header">' +
-      '<div class="set-card-title">Companía ' + setCounter + '</div>' +
+      '<div class="set-card-title">Compañía ' + setCounter + '</div>' +
       (setCounter > 1 ? '<button class="set-remove-btn" onclick="removeSet(\'' + id + '\')">×</button>' : '') +
     '</div>' +
     '<div class="field">' +
-      '<label>Tipo de Companerismo</label>' +
+      '<label>Tipo de compañerismo</label>' +
       '<div class="pill-row">' +
         '<button class="pill-btn' + (type === 'elderes'  ? ' selected' : '') + '" data-set="' + id + '" data-val="elderes"  onclick="selectSetType(this)">Élderes</button>' +
         '<button class="pill-btn' + (type === 'hermanas' ? ' selected' : '') + '" data-set="' + id + '" data-val="hermanas" onclick="selectSetType(this)">Hermanas</button>' +
       '</div>' +
     '</div>' +
     '<div class="field">' +
-      '<label>Zona / Área <span class="opt">(opcional — para proximidad)</span></label>' +
-      '<input type="text" id="' + id + '_label" placeholder="Ej: Élderes Fuquay, Hermanas Garner" value="' + escHtml(lbl) + '">' +
+      '<label>Nombres de los misioneros <span class="opt">(opcional)</span></label>' +
+      '<input type="text" id="' + id + '_label" placeholder="Ej: Elder Pérez, Elder Smith" value="' + escHtml(lbl) + '">' +
     '</div>' +
     '<div class="field">' +
-      '<label>Alergias o restricciones alimentarias <span class="opt">(opcional)</span></label>' +
-      '<input type="text" id="' + id + '_allergies" placeholder="Ej: sin gluten, vegetariano" value="' + escHtml(alg) + '">' +
+      '<label>Restricciones alimentarias de los misioneros <span class="opt">(opcional)</span></label>' +
+      '<input type="text" id="' + id + '_allergies" placeholder="Ej: sin gluten, enfermedad celíaca, vegetariano" value="' + escHtml(alg) + '">' +
     '</div>';
 
   document.getElementById('setsList').appendChild(card);
@@ -447,7 +448,7 @@ function removeSet(id) {
 function renumberSets() {
   document.querySelectorAll('.set-card').forEach(function(card, idx) {
     const titleEl = card.querySelector('.set-card-title');
-    if (titleEl) titleEl.textContent = 'Companía ' + (idx + 1);
+    if (titleEl) titleEl.textContent = 'Compañía ' + (idx + 1);
   });
 }
 
@@ -470,7 +471,18 @@ function collectSets() {
 function validateSetsAndContinue() {
   const err  = document.getElementById('setsError');
   const sets = collectSets();
-  if (sets.length === 0) { showError(err, 'Agregue al menos una companía de misioneros.'); return; }
+
+  if (sets.length === 0) {
+    showError(err, 'Agregue al menos una compañía de misioneros.');
+    return;
+  }
+
+  const sisterCount = sets.filter(function(s) { return s.type === 'hermanas'; }).length;
+  if (sisterCount > 1) {
+    showError(err, 'Garner tiene una sola compañía de Hermanas. Deje solo una tarjeta de Hermanas.');
+    return;
+  }
+
   err.classList.remove('visible');
   state.missionarySets = sets;
   goTo(4);
@@ -648,7 +660,7 @@ async function saveAndFinish() {
 
 function renderSuccess() {
   const sets = state.missionarySets.map(function(s, i) {
-    return '• Companía ' + (i+1) + ': ' + (s.type === 'elderes' ? 'Élderes' : 'Hermanas') +
+    return '• Compañía ' + (i+1) + ': ' + (s.type === 'elderes' ? 'Élderes' : 'Hermanas') +
            (s.label ? ' — ' + s.label : '') +
            (s.allergies ? ' (Alergias: ' + s.allergies + ')' : '');
   }).join('\n');
