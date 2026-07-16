@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <!-- Garner clean transfer update v6: dynamic single-companionship flow -->
 <html lang="es">
@@ -415,15 +416,36 @@
       background: #eaecf2;
       color: #777;
       cursor: pointer;
+      flex-direction: column;
+      gap: 1px;
+      line-height: 1.05;
+      border: 1px solid #d9dee8;
     }
 
-    .cal-day.booked::after {
-      content: '✕';
-      position: absolute;
+    .cal-day.booked:hover,
+    .cal-day.booked:focus {
+      background: #dfe5ef;
+      outline: 2px solid rgba(15, 102, 116, 0.25);
+      outline-offset: 2px;
+    }
+
+    .booked-cue {
+      display: block;
       font-size: 9px;
-      bottom: 2px;
-      right: 3px;
-      color: #999;
+      font-weight: 700;
+      color: #0f6674;
+      letter-spacing: 0.1px;
+    }
+
+    .calendar-tap-help {
+      margin: 10px 0 10px;
+      padding: 9px 10px;
+      border-radius: 12px;
+      background: #f2f7f8;
+      color: #305a66;
+      font-size: 12px;
+      line-height: 1.35;
+      border: 1px solid #d7e8ec;
     }
 
     .booked-info {
@@ -1069,6 +1091,10 @@
         </div>
       </div>
 
+      <div class="calendar-tap-help" id="calendarTapHelp" data-i18n="calendarTapHelp">
+        Fechas en gris ya están reservadas. Toque una fecha en gris para ver los detalles.
+      </div>
+
       <div class="cal-grid" id="calGrid"></div>
 
       <div class="booked-info" id="bookedInfo"></div>
@@ -1224,8 +1250,10 @@ const I18N = {
     checkingAvailability: 'Revisando disponibilidad...',
     monthCompleteAdvancing: '📅 Este mes está completo para todos los grupos.<br>Avanzando al próximo mes...',
     available: 'Disponible',
-    bookedX: 'Reservado ✕',
+    bookedX: 'Reservado · Ver',
     past: 'Pasado',
+    calendarTapHelp: 'Fechas en gris ya están reservadas. Toque una fecha en gris para ver los detalles.',
+    viewBookedCue: 'Ver',
     reservedTitle: 'Reservado',
     reservedIntro: 'Esta fecha ya está reservada por:',
     reservedTime: 'Hora',
@@ -1315,8 +1343,10 @@ const I18N = {
     checkingAvailability: 'Checking availability...',
     monthCompleteAdvancing: '📅 This month is full for all groups.<br>Moving to next month...',
     available: 'Available',
-    bookedX: 'Booked ✕',
+    bookedX: 'Booked · View',
     past: 'Past',
+    calendarTapHelp: 'Gray dates are already reserved. Tap a gray date to view the details.',
+    viewBookedCue: 'View',
     reservedTitle: 'Reserved',
     reservedIntro: 'This date is already reserved by:',
     reservedTime: 'Time',
@@ -1861,7 +1891,13 @@ function renderCalendar() {
     } else if (isBooked) {
       cell.className = 'cal-day booked';
       cell.type = 'button';
-      cell.setAttribute('aria-label', `${tr('reservedTitle')}: ${formatDateDisplay(date)}`);
+      cell.setAttribute('aria-label', `${tr('reservedTitle')}: ${formatDateDisplay(date)}. ${tr('calendarTapHelp')}`);
+
+      const cue = document.createElement('span');
+      cue.className = 'booked-cue';
+      cue.textContent = tr('viewBookedCue');
+      cell.appendChild(cue);
+
       cell.onclick = () => showBookedDetails(dateStr, date);
     } else {
       cell.className = 'cal-day available';
