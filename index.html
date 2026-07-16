@@ -208,6 +208,26 @@
       gap: 10px;
     }
 
+    .group-status {
+      display: none;
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      color: var(--gray);
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: center;
+      box-shadow: inset 0 0 0 1px rgba(26,42,74,0.05);
+    }
+
+    .group-status.visible { display: block; }
+
+    .group-status.error {
+      color: #c0392b;
+      background: #fdf0f0;
+      border: 1px solid #f0c0c0;
+    }
+
     .group-btn {
       display: flex;
       align-items: center;
@@ -393,8 +413,8 @@
 
     .cal-day.booked {
       background: #eaecf2;
-      color: #bbb;
-      pointer-events: none;
+      color: #777;
+      cursor: pointer;
     }
 
     .cal-day.booked::after {
@@ -403,7 +423,70 @@
       font-size: 9px;
       bottom: 2px;
       right: 3px;
-      color: #bbb;
+      color: #999;
+    }
+
+    .booked-info {
+      display: none;
+      margin-top: 12px;
+      border-radius: var(--radius);
+      background: var(--light);
+      border: 1px solid #dce3ef;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .booked-info.visible { display: block; }
+
+    .booked-info-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 14px;
+      background: #eaecf2;
+      color: var(--navy);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .booked-info-close {
+      border: none;
+      background: transparent;
+      color: var(--navy);
+      font-size: 18px;
+      font-weight: 800;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0 2px;
+    }
+
+    .booked-info-body {
+      padding: 13px 14px 14px;
+      font-size: 14px;
+      color: var(--navy);
+      line-height: 1.5;
+    }
+
+    .booked-family {
+      font-size: 17px;
+      font-weight: 800;
+      margin: 4px 0 8px;
+    }
+
+    .booked-detail-line {
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 3px;
+    }
+
+    .booked-private-note {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #dce3ef;
+      font-size: 12px;
+      color: var(--gray);
+      font-style: italic;
     }
 
     .cal-day.today::before {
@@ -943,6 +1026,7 @@
   <div class="screen active" id="s1">
     <p class="screen-title" data-i18n="groupTitle">¿A quién desea invitar?</p>
     <p class="screen-sub" data-i18n="groupSub">Seleccione el grupo para ver las fechas disponibles.</p>
+    <div class="group-status visible" id="groupStatus" data-status-key="loadingGroups">Cargando misioneros disponibles...</div>
     <div class="group-list" id="groupList"></div>
   </div>
 
@@ -986,6 +1070,8 @@
       </div>
 
       <div class="cal-grid" id="calGrid"></div>
+
+      <div class="booked-info" id="bookedInfo"></div>
 
       <div class="cal-legend">
         <div class="legend-item">
@@ -1100,11 +1186,7 @@ const GROUP_CATALOG = {
   hermanas:         { id: 'hermanas',         label: 'Hermanas',             desc: 'Compañía de Hermanas',         icon: 'icon-hermanas.jpg', bg: '#6d2b4e', fg: '#e8b4cc' }
 };
 
-let GROUPS = [
-  GROUP_CATALOG.todos_misioneros,
-  GROUP_CATALOG.elderes_garner,
-  GROUP_CATALOG.hermanas
-];
+let GROUPS = [];
 
 const TIME_SLOTS = [
   '3:00 pm','3:30 pm','4:00 pm','4:30 pm',
@@ -1132,6 +1214,9 @@ const I18N = {
     headerTitle: 'Comidas para los Misioneros',
     groupTitle: '¿A quién desea invitar?',
     groupSub: 'Seleccione el grupo para ver las fechas disponibles.',
+    loadingGroups: 'Cargando misioneros disponibles...',
+    groupLoadError: 'No se pudo cargar la configuración de los misioneros. Por favor actualice la página o comuníquese con la coordinadora.',
+    noActiveGroups: 'No hay misioneros activos configurados para reservar comidas. Por favor comuníquese con la coordinadora.',
     loadingTitle: 'Cargando fechas disponibles...',
     loadingSub: 'Espere unos segundos mientras revisamos el calendario.',
     calendarError: 'No se pudieron cargar las fechas. Por favor intente de nuevo.',
@@ -1141,6 +1226,12 @@ const I18N = {
     available: 'Disponible',
     bookedX: 'Reservado ✕',
     past: 'Pasado',
+    reservedTitle: 'Reservado',
+    reservedIntro: 'Esta fecha ya está reservada por:',
+    reservedTime: 'Hora',
+    reservedGroup: 'Grupo',
+    reservedPrivateNote: 'Por privacidad, solo se muestra el apellido de la familia, la hora y el grupo de misioneros.',
+    reservedUnknown: 'Reservación existente',
     nextMonthHint: '👉 ¿No ve su fecha? Toque › para ver el próximo mes',
     timeTitle: 'Seleccione la hora',
     timeSub: 'Escoja la hora a la que prefiere servir la comida.',
@@ -1214,6 +1305,9 @@ const I18N = {
     headerTitle: 'Meals for the Missionaries',
     groupTitle: 'Who would you like to invite?',
     groupSub: 'Select a group to see available dates.',
+    loadingGroups: 'Loading available missionaries...',
+    groupLoadError: 'Missionary settings could not be loaded. Please refresh the page or contact the coordinator.',
+    noActiveGroups: 'There are no active missionaries configured for meal scheduling. Please contact the coordinator.',
     loadingTitle: 'Loading available dates...',
     loadingSub: 'Please wait a few seconds while we check the calendar.',
     calendarError: 'Available dates could not be loaded. Please try again.',
@@ -1223,6 +1317,12 @@ const I18N = {
     available: 'Available',
     bookedX: 'Booked ✕',
     past: 'Past',
+    reservedTitle: 'Reserved',
+    reservedIntro: 'This date is already reserved by:',
+    reservedTime: 'Time',
+    reservedGroup: 'Group',
+    reservedPrivateNote: 'For privacy, only the family last name, time, and missionary group are shown.',
+    reservedUnknown: 'Existing reservation',
     nextMonthHint: '👉 Don’t see your date? Tap › to view next month',
     timeTitle: 'Select the time',
     timeSub: 'Choose the time you would prefer to serve the meal.',
@@ -1354,7 +1454,12 @@ function applyLanguage() {
   document.getElementById('langEs')?.classList.toggle('active', currentLang === 'es');
   document.getElementById('langEn')?.classList.toggle('active', currentLang === 'en');
 
-  if (!singleGroupMode) buildGroupList();
+  const groupStatus = document.getElementById('groupStatus');
+  if (groupStatus && groupStatus.dataset.statusKey) {
+    groupStatus.textContent = tr(groupStatus.dataset.statusKey);
+  }
+
+  if (!singleGroupMode && GROUPS.length) buildGroupList();
 
   if (state.group) {
     document.getElementById('headerSub').textContent = groupDisplayLabel(state.group);
@@ -1407,6 +1512,7 @@ let state = {
   calMonth: new Date().getMonth(),
   bookedDates: new Set(),
   bookedSlots: {},
+  bookedDetails: {},
   selDate: null,
   selTime: null,
   selWeeks: 1,
@@ -1425,48 +1531,79 @@ window.addEventListener('DOMContentLoaded', async () => {
   currentLang = localStorage.getItem('mealSchedulerLang') === 'en' ? 'en' : 'es';
   applyLanguage();
   updateDots(1);
+  showGroupStatus('loadingGroups', false);
 
-  // Load coordinator-panel settings. The public page follows the active missionary sets.
+  await loadPublicSettings();
+});
+
+async function loadPublicSettings() {
   try {
     const url  = `${API_URL}?action=settings&t=${Date.now()}`;
     const res  = await fetch(url, { method: 'GET', cache: 'no-store' });
-    const data = await res.json();
-    if (data && data.success) {
-      safetyScreeningEnabled = !!data.safetyScreeningEnabled;
-      missionaryFoodInfo = data.missionaryFoodInfo || {};
+    if (!res.ok) throw new Error('Settings request failed');
 
-      if (Array.isArray(data.activeGroups)) {
-        const activeGroups = data.activeGroups
+    const data = await res.json();
+    if (!data || !data.success) throw new Error('Settings response failed');
+
+    safetyScreeningEnabled = !!data.safetyScreeningEnabled;
+    missionaryFoodInfo     = data.missionaryFoodInfo || {};
+
+    const activeGroups = Array.isArray(data.activeGroups)
+      ? data.activeGroups
           .filter(g => g && GROUP_CATALOG[g.id])
           .map(g => Object.assign({}, GROUP_CATALOG[g.id], {
             label: g.label || GROUP_CATALOG[g.id].label,
             desc:  g.desc  || GROUP_CATALOG[g.id].desc
-          }));
+          }))
+      : [];
 
-        if (activeGroups.length > 0) {
-          GROUPS = activeGroups;
-        }
-      }
+    if (activeGroups.length === 0) {
+      GROUPS = [];
+      singleGroupMode = false;
+      showGroupStatus('noActiveGroups', true);
+      return;
+    }
 
-      document.getElementById('screeningField').style.display =
-        safetyScreeningEnabled ? 'block' : 'none';
+    GROUPS = activeGroups;
+
+    document.getElementById('screeningField').style.display =
+      safetyScreeningEnabled ? 'block' : 'none';
+
+    singleGroupMode = GROUPS.length === 1;
+
+    if (singleGroupMode) {
+      hideGroupStatus();
+      await selectGroup(GROUPS[0]);
+    } else {
+      hideGroupStatus();
+      buildGroupList();
     }
   } catch (e) {
+    GROUPS = [];
+    singleGroupMode = false;
     safetyScreeningEnabled = false;
+    showGroupStatus('groupLoadError', true);
   }
+}
 
-  singleGroupMode = GROUPS.length === 1;
+function showGroupStatus(key, isError) {
+  const el = document.getElementById('groupStatus');
+  if (!el) return;
+  el.dataset.statusKey = key;
+  el.textContent = tr(key);
+  el.classList.add('visible');
+  el.classList.toggle('error', !!isError);
+}
 
-  if (singleGroupMode) {
-    // With only one active companionship, do not ask members to choose a group.
-    // Go straight to the calendar for that companionship.
-    await selectGroup(GROUPS[0]);
-  } else {
-    buildGroupList();
-  }
-});
+function hideGroupStatus() {
+  const el = document.getElementById('groupStatus');
+  if (!el) return;
+  el.classList.remove('visible', 'error');
+  el.dataset.statusKey = '';
+}
 
 function buildGroupList() {
+  hideGroupStatus();
   const el = document.getElementById('groupList');
   el.innerHTML = '';
   GROUPS.forEach(g => {
@@ -1494,6 +1631,7 @@ async function selectGroup(g) {
   state.calMonth         = new Date().getMonth();
   state.bookedDates      = new Set();
   state.bookedSlots      = {};
+  state.bookedDetails    = {};
   state.selDate          = null;
   state.selTime          = null;
   state.selWeeks         = 1;
@@ -1514,6 +1652,7 @@ async function selectGroup(g) {
   document.getElementById('headerSub').style.color        = g.fg;
 
   resetAvailPanel();
+  hideBookedDetails();
 
   goTo(2);
   hideCalendarWhileLoading();
@@ -1599,12 +1738,14 @@ async function loadBooked() {
     if (!res.ok) return false;
     const data = await res.json();
     if (!data || !Array.isArray(data.bookedDates)) return false;
-    state.bookedDates = new Set(data.bookedDates || []);
-    state.bookedSlots = data.bookedSlots || {};
+    state.bookedDates   = new Set(data.bookedDates || []);
+    state.bookedSlots   = data.bookedSlots || {};
+    state.bookedDetails = data.bookedDetails || {};
     return true;
   } catch (e) {
-    state.bookedDates = new Set();
-    state.bookedSlots = {};
+    state.bookedDates   = new Set();
+    state.bookedSlots   = {};
+    state.bookedDetails = {};
     return false;
   }
 }
@@ -1671,6 +1812,7 @@ async function evaluateFullMonthAvailability() {
 }
 
 function renderCalendar() {
+  hideBookedDetails();
   const today    = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -1718,6 +1860,9 @@ function renderCalendar() {
       cell.className = 'cal-day past';
     } else if (isBooked) {
       cell.className = 'cal-day booked';
+      cell.type = 'button';
+      cell.setAttribute('aria-label', `${tr('reservedTitle')}: ${formatDateDisplay(date)}`);
+      cell.onclick = () => showBookedDetails(dateStr, date);
     } else {
       cell.className = 'cal-day available';
       if (isToday) cell.classList.add('today');
@@ -1745,6 +1890,7 @@ function renderCalendar() {
 
 function changeMonth(dir) {
   resetAvailPanel();
+  hideBookedDetails();
   state.calMonth += dir;
   if (state.calMonth < 0)  { state.calMonth = 11; state.calYear--; }
   if (state.calMonth > 11) { state.calMonth = 0;  state.calYear++; }
@@ -1818,6 +1964,70 @@ async function toggleAvailPanel() {
   });
 
   state.availPanelLoaded = true;
+}
+
+function showBookedDetails(dateStr, date) {
+  const box = document.getElementById('bookedInfo');
+  if (!box) return;
+
+  const details = Array.isArray(state.bookedDetails[dateStr])
+    ? state.bookedDetails[dateStr]
+    : [];
+
+  const dateLabel = formatDateDisplay(date);
+
+  let rows = '';
+  if (details.length === 0) {
+    rows = `
+      <div class="booked-family">${escapeHtml(tr('reservedUnknown'))}</div>
+    `;
+  } else {
+    rows = details.map(d => {
+      const family = currentLang === 'en'
+        ? (d.familyDisplayEn || d.familyName || tr('reservedUnknown'))
+        : (d.familyDisplayEs || d.familyName || tr('reservedUnknown'));
+      const group = currentLang === 'en'
+        ? (d.groupLabelEn || d.groupLabelEs || '')
+        : (d.groupLabelEs || d.groupLabelEn || '');
+      const time = d.time || '';
+
+      return `
+        <div class="booked-family">${escapeHtml(family)}</div>
+        ${time ? `<div class="booked-detail-line"><strong>${escapeHtml(tr('reservedTime'))}:</strong> ${escapeHtml(time)}</div>` : ''}
+        ${group ? `<div class="booked-detail-line"><strong>${escapeHtml(tr('reservedGroup'))}:</strong> ${escapeHtml(group)}</div>` : ''}
+      `;
+    }).join('');
+  }
+
+  box.innerHTML = `
+    <div class="booked-info-head">
+      <div>${escapeHtml(tr('reservedTitle'))} — ${escapeHtml(dateLabel)}</div>
+      <button type="button" class="booked-info-close" onclick="hideBookedDetails()" aria-label="Close">×</button>
+    </div>
+    <div class="booked-info-body">
+      <div>${escapeHtml(tr('reservedIntro'))}</div>
+      ${rows}
+      <div class="booked-private-note">${escapeHtml(tr('reservedPrivateNote'))}</div>
+    </div>
+  `;
+  box.classList.add('visible');
+  box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function hideBookedDetails() {
+  const box = document.getElementById('bookedInfo');
+  if (!box) return;
+  box.classList.remove('visible');
+  box.innerHTML = '';
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 function findNextOpenDate(bookedSet, year, month) {
